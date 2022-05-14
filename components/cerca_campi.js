@@ -4,8 +4,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { Searchbar } from 'react-native-paper';
-import { View, Text } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, Alert } from 'react-native';
 import styles from '../styles/cerca_campi';
+import { set } from 'react-native-reanimated';
+import { ComponentEventsObserver } from 'react-native-navigation/lib/dist/src/events/ComponentEventsObserver';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -37,29 +40,80 @@ const SearchCampi = () => {
     );
 }
 
+class ListaCampi extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            campi: [],
+            search: '',
+            refresh: true,
+        }
+    }
+
+    componentDidMount() {
+        this.getCampi();
+    }
+
+    getCampi = async () => {
+        await fetch('http://192.168.1.120:9080/api/v1/campi')
+            .then(response => response.json())
+            .then(responseJson => {
+                console.log(responseJson);
+                this.setState({
+                    //sort by name
+                    campi: responseJson.sort((a, b) => (a.nome > b.nome) ? 1 : -1),
+                    refresh: false,
+                })
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
+    filtraCampi = () => {
+        return this.state.campi.filter(campo => {
+            return campo.nome.toLowerCase().includes(this.state.search.toLowerCase());
+        })
+    }
+
+    render() {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Searchbar
+                    placeholder="Cerca per nome"
+                    onChangeText={(text) => this.setState({ search: text })}
+                    value={this.state.search}
+                />
+                <FlatList
+                    data={this.filtraCampi()}
+                    renderItem={({ item }) =>
+                        <TouchableOpacity
+                            onPress={() => Alert.alert(item.nome, "Tariffa: "+item.tariffa.toString() + '€')}
+                            activeOpacity={0.8}
+                        >
+                            <View style={styles.item}>
+                                <Text style={styles.text}>{item.nome}</Text>
+                                <Text style={styles.indirizzo}>{item.indirizzo}, {item.citta}, {item.cap}, {item.provincia}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    }
+                    keyExtractor={item => item.id}
+                    refreshing={this.state.refresh}
+                    onRefresh={() => this.getCampi()}
+                />
+            </SafeAreaView>
+        );
+    }
+}
+
 function SearchCampiByName({ navigation }) {
 
-    const [searchQuery, setSearchQuery] = React.useState('');
-
-    const onChangeSearch = query => setSearchQuery(query);
-
     return (
-        <>
-            <View style={{ alignItems: 'center' }}>
-                <Searchbar
-                    placeholder="Cerca campo"
-                    onChangeText={onChangeSearch}
-                    value={searchQuery}
-                />
-            </View>
-            <View style={ styles.container }>
-                <Text>
-                    {/* change "softwareKeyboardLayoutMode": "pan" in app.json if you don't want the view to be pushed up */}
-                    {searchQuery?.length > 0 ? searchQuery : 'Lista campi'}
-                </Text>
-            </View>
-        </>
-    );
+        <View style={styles.container}>
+            <ListaCampi
+            />
+        </View>
+    )
 }
 
 function SearchCampiByMap({ navigation }) {
@@ -75,9 +129,20 @@ function SearchCampiByMap({ navigation }) {
                     longitudeDelta: 0.03,
                 }}
             >
+                <MapView.Marker
+                    coordinate={{
+                        latitude: 46.065,
+                        longitude: 11.125,
+                    }}
+                    title={"Campo"}
+                    description={"Campo da calcio"}
+                    onCalloutPress={() => {
+                        Alert.alert("Campo", "Campo da calcio")
+                    }}
+                />
             </MapView>
         </View>
-    );
+    )
 }
 
 module.exports = ShowCampi;
