@@ -72,7 +72,13 @@ class ListaCampi extends React.Component {
 
     filtraCampi = () => {
         return this.state.campi.filter(campo => {
-            return campo.nome.toLowerCase().includes(this.state.search.toLowerCase());
+            const tariffa = campo.tariffa.toString();
+            return campo.nome.toLowerCase().includes(this.state.search.toLowerCase()) ||
+                campo.indirizzo.toLowerCase().includes(this.state.search.toLowerCase()) ||
+                campo.citta.toLowerCase().includes(this.state.search.toLowerCase()) ||
+                campo.cap.toLowerCase().includes(this.state.search.toLowerCase()) ||
+                campo.provincia.toLowerCase().includes(this.state.search.toLowerCase()) ||
+                tariffa.includes(this.state.search.toLowerCase())
         })
     }
 
@@ -80,7 +86,7 @@ class ListaCampi extends React.Component {
         return (
             <SafeAreaView style={styles.container}>
                 <Searchbar
-                    placeholder="Cerca per nome"
+                    placeholder="Nome, indirizzo, luogo, tariffa"
                     onChangeText={(text) => this.setState({ search: text })}
                     value={this.state.search}
                 />
@@ -88,7 +94,7 @@ class ListaCampi extends React.Component {
                     data={this.filtraCampi()}
                     renderItem={({ item }) =>
                         <TouchableOpacity
-                            onPress={() => Alert.alert(item.nome, "Tariffa: "+item.tariffa.toString() + '€')}
+                            onPress={() => Alert.alert(item.nome, "Tariffa: " + item.tariffa.toString() + '€')}
                             activeOpacity={0.8}
                         >
                             <View style={styles.item}>
