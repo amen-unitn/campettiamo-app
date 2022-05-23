@@ -5,11 +5,11 @@ styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'column',
   },
   map: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    width: '100%',
+    height: '83%',
   },
   item: {
     flex: 1,
@@ -27,6 +27,10 @@ styles = StyleSheet.create({
   },
   indirizzo: {
     color: 'white',
+  },
+  info: {
+    flex: 1,
+    flexDirection: 'column',
   }
 });
 
