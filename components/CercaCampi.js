@@ -27,8 +27,12 @@ class Dettaglio extends React.Component {
         super(props);
         this.state = {
             id: props.campo,
-            info: {}
+            info: {},
+            year: new Date().getFullYear(),
+            month: new Date().getMonth() + 1,
+            days: {}
         }
+        this.slots(this.state.year, this.state.month)
         this.infoCampoDaID(this.state.id)
     }
 
@@ -36,7 +40,7 @@ class Dettaglio extends React.Component {
         return await fetch('https://campettiamo.herokuapp.com/api/v1/campo/' + id, {
             method: 'GET',
             headers: new Headers({
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvbmkubmVncmlAZ21haWwuY29tIiwiaWQiOiJhNDZiNTQyOS1lYmQ0LTQ1ZGItOTYxYS1kZmQ3NDVhODIwOWIiLCJ0aXBvbG9naWEiOiJVdGVudGUiLCJpYXQiOjE2NTMzMTQ2NjYsImV4cCI6MTY1MzQwMTA2Nn0.1K_wa3vAy-y0b3H-drY7cwNTauaDErqr-k5AjxqHi6g',
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQwNjg5OSwiZXhwIjoxNjUzNDkzMjk5fQ.pkHhdraTKdFJ-jQV7t0HIoc4q1hrGeCsMwOJkF5CrFo',
                 'Content-Type': 'application/json'
             })
         })
@@ -48,69 +52,74 @@ class Dettaglio extends React.Component {
 
     componentDidMount() {
         this.infoCampoDaID(this.state.id)
+        this.setState({ year: new Date().getFullYear() })
+        this.setState({ month: new Date().getMonth() + 1 })
+        this.setState({ days: this.slots(this.state.year, this.state.month) })
     }
-
-
 
     render() {
 
-        var month = new Date()
-        month = month.getMonth() + 1
-        var year = new Date()
-        year = year.getFullYear()
-
         return (
-            <SafeAreaView style={styles.container}>
-                <Text style={{
-                    fontWeight: 'bold',
-                    fontSize: 20,
-                    justifyContent: 'flex-start',
-                    textAlign: 'center',
-                }}>{this.state.info.nome}</Text>
-                <SafeAreaView style={styles.info}>
-                    <Text>Indirizzo: {this.state.info.indirizzo}, {this.state.info.citta}, {this.state.info.cap} {this.state.info.provincia}</Text>
-                    <Text>Tariffa: {this.state.info.tariffa} euro</Text>
-                    <Text>Prenota entro: {this.state.info.prenotaEntro} ore</Text>
+            <>
+                <SafeAreaView style={styles.container}>
                     <Text style={{
-                        flex: 1,
-                        flexWrap: 'wrap',
-                    }}>Sport: {this.state.info.sport}</Text>
+                        fontWeight: 'bold',
+                        fontSize: 20,
+                        justifyContent: 'flex-start',
+                        textAlign: 'center',
+                    }}>{this.state.info.nome}</Text>
+                    <SafeAreaView style={styles.info}>
+                        <Text>Indirizzo: {this.state.info.indirizzo}, {this.state.info.citta}, {this.state.info.cap} {this.state.info.provincia}</Text>
+                        <Text>Tariffa: {this.state.info.tariffa} euro</Text>
+                        <Text>Prenota entro: {this.state.info.prenotaEntro} ore</Text>
+                        <Text style={{
+                            flex: 1,
+                            flexWrap: 'wrap',
+                        }}>Sport: {this.state.info.sport}</Text>
+                    </SafeAreaView>
                 </SafeAreaView>
                 <SafeAreaView>
                     <Calendar style={{
-                        marginBottom: '50%',
+                        marginBottom: '25%',
+                        marginHorizontal: '5%',
                     }}
                         onMonthChange={(month) => {
-                            this.month = month
+                            this.setState({ month: month.month })
                         }}
-                        markedDates={this.slots(year, month)}
+                        markedDates={this.state.days}
+                        theme={{
+                            todayTextColor: '#72bb53',
+                            arrowColor: '#72bb53',
+                        }}
+
                     />
                 </SafeAreaView>
-            </SafeAreaView>
+            </>
         )
     }
 
     slots = async (year, month) => {
-        const giorni = await fetch('https://campettiamo.herokuapp.com/api/v1/campo/' + this.state.id + '/slot/' + year + '-' + month, {
+
+        let month_padded = (month < 10) ? '0' + month : month;
+
+        const giorni = await fetch('https://campettiamo.herokuapp.com/api/v1/campo/' + this.state.id + '/slot/mese/' + year + '-' + month_padded, {
             method: 'GET',
             headers: new Headers({
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvbmkubmVncmlAZ21haWwuY29tIiwiaWQiOiJhNDZiNTQyOS1lYmQ0LTQ1ZGItOTYxYS1kZmQ3NDVhODIwOWIiLCJ0aXBvbG9naWEiOiJVdGVudGUiLCJpYXQiOjE2NTMzMTQ2NjYsImV4cCI6MTY1MzQwMTA2Nn0.1K_wa3vAy-y0b3H-drY7cwNTauaDErqr-k5AjxqHi6g',
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQwNjg5OSwiZXhwIjoxNjUzNDkzMjk5fQ.pkHhdraTKdFJ-jQV7t0HIoc4q1hrGeCsMwOJkF5CrFo',
                 'Content-Type': 'application/json'
             })
         }).then(response => response.json())
 
-        let lista_giorni = null
+        let lista_giorni = {}
 
         for (var i = 0; i < giorni.length; i++) {
-            lista_giorni = {
-                [year + '-' + month + '-' + giorni[i]]: {
-                    marked: true,
-                    selectedColor: '#0099ff',
-                }
+            lista_giorni[year + '-' + month_padded + '-' + giorni[i]] = {
+                selected: true,
+                selectedColor: '#72bb53',
             }
-
         }
-        return lista_giorni
+
+        this.state.days = lista_giorni
     }
 }
 
@@ -134,7 +143,7 @@ const SearchCampi = ({ navigation }) => {
                 }
             }} />
             <Tab.Screen name="Cerca sulla mappa" children={() => (
-                <ListaCampi mappa={true} />
+                <ListaCampi navigation={navigation} mappa={true} />
             )} options={{
                 tabBarIndicatorStyle: {
                     backgroundColor: '#72bb53'
@@ -160,6 +169,8 @@ class ListaCampi extends React.Component {
             raggio: 5,
             refresh: true,
             mappa: this.props.mappa,
+            latitude: 46.065,
+            longitude: 11.125,
             latitudeDelta: 0.0372,
             longitudeDelta: 0.03,
         }
@@ -225,7 +236,7 @@ class ListaCampi extends React.Component {
         await fetch('https://campettiamo.herokuapp.com/api/v1/campi-nome?nome=' + this.state.searchNome, {
             method: 'GET',
             headers: new Headers({
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvbmkubmVncmlAZ21haWwuY29tIiwiaWQiOiJhNDZiNTQyOS1lYmQ0LTQ1ZGItOTYxYS1kZmQ3NDVhODIwOWIiLCJ0aXBvbG9naWEiOiJVdGVudGUiLCJpYXQiOjE2NTMzMTQ2NjYsImV4cCI6MTY1MzQwMTA2Nn0.1K_wa3vAy-y0b3H-drY7cwNTauaDErqr-k5AjxqHi6g',
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQwNjg5OSwiZXhwIjoxNjUzNDkzMjk5fQ.pkHhdraTKdFJ-jQV7t0HIoc4q1hrGeCsMwOJkF5CrFo',
                 'Content-Type': 'application/json'
             })
         })
@@ -245,7 +256,7 @@ class ListaCampi extends React.Component {
         await fetch('https://campettiamo.herokuapp.com/api/v1/campi-luogo?luogo=' + luogo + '&raggio=' + this.state.raggio, {
             method: 'GET',
             headers: new Headers({
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvbmkubmVncmlAZ21haWwuY29tIiwiaWQiOiJhNDZiNTQyOS1lYmQ0LTQ1ZGItOTYxYS1kZmQ3NDVhODIwOWIiLCJ0aXBvbG9naWEiOiJVdGVudGUiLCJpYXQiOjE2NTMzMTQ2NjYsImV4cCI6MTY1MzQwMTA2Nn0.1K_wa3vAy-y0b3H-drY7cwNTauaDErqr-k5AjxqHi6g',
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQwNjg5OSwiZXhwIjoxNjUzNDkzMjk5fQ.pkHhdraTKdFJ-jQV7t0HIoc4q1hrGeCsMwOJkF5CrFo',
                 'Content-Type': 'application/json'
             })
         })
@@ -309,16 +320,20 @@ class ListaCampi extends React.Component {
                         value={this.state.search}
                     />
                     <MapView
+                        showsUserLocation={true}
+                        
                         provider={PROVIDER_GOOGLE}
                         style={styles.map}
                         region={{
-                            latitude: 46.065,
-                            longitude: 11.125,
+                            latitude: this.state.latitude,
+                            longitude: this.state.longitude,
                             latitudeDelta: this.state.latitudeDelta,
                             longitudeDelta: this.state.longitudeDelta,
                         }}
                         onRegionChangeComplete={(region) => {
                             this.setState({
+                                latitude: region.latitude,
+                                longitude: region.longitude,
                                 latitudeDelta: region.latitudeDelta,
                                 longitudeDelta: region.longitudeDelta,
                             })
@@ -332,7 +347,10 @@ class ListaCampi extends React.Component {
                                     latitude: campo.lat,
                                     longitude: campo.lng
                                 }}
-                                onCalloutPress={() => Alert.alert(campo.nome, "Tariffa: " + campo.tariffa.toString() + '€')}
+                                onCalloutPress={() => {
+                                    console.log(campo.id)
+                                    this.navigation.navigate('Dettaglio campo', { campo: campo.id })
+                                }}
                             >
                                 <MapView.Callout>
                                     <SafeAreaView>
