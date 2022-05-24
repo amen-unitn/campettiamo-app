@@ -28,7 +28,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "softwareKeyboardLayoutMode": "auto"
+      "softwareKeyboardLayoutMode": "auto",
+      "package": "com.mattia2700.Campettiamo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
