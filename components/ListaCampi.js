@@ -6,6 +6,9 @@ import styles from '../styles/cerca_campi';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import InputSpinner from 'react-native-input-spinner'
 import * as Location from 'expo-location';
+import { apiCall } from './utils';
+
+const tempToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQ3MDQ0MSwiZXhwIjoxNjUzNTU2ODQxfQ.PDadY9oaX33e-_BclHoQ7s_9kzY4jxKJqBZRNbkfvVs";
 
 class ListaCampi extends React.Component {
     constructor(props) {
@@ -32,7 +35,7 @@ class ListaCampi extends React.Component {
     }
 
     componentDidMount() {
-        this.get_curent_location();
+        this.get_current_location();
         this.setState({ refresh: false });
     }
 
@@ -90,10 +93,10 @@ class ListaCampi extends React.Component {
         return elements;
     }
 
-    get_curent_location = async () => {
+    get_current_location = async () => {
         await Location.requestForegroundPermissionsAsync().then(() => {
             Location.getCurrentPositionAsync({
-                enableHighAccuracy: true,
+                enableHighAccuracy: false,
             }).then((location) => {
                 this.setState({
                     latitude: location.coords.latitude,
@@ -106,15 +109,9 @@ class ListaCampi extends React.Component {
         });
     }
 
-    listCampiByNome = async () => {
-        await fetch('https://campettiamo.herokuapp.com/api/v1/campi-nome?nome=' + this.state.searchNome, {
-            method: 'GET',
-            headers: new Headers({
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQ3MDQ0MSwiZXhwIjoxNjUzNTU2ODQxfQ.PDadY9oaX33e-_BclHoQ7s_9kzY4jxKJqBZRNbkfvVs',
-                'Content-Type': 'application/json'
-            })
-        })
-            .then(response => response.json())
+    listCampiByNome = () => {
+
+        apiCall(tempToken, "campi-nome", "GET", [{name:"nome", value:this.state.searchNome}], null)
             .then(responseJson => {
                 this.setState({
                     campiNome: responseJson,
@@ -125,16 +122,10 @@ class ListaCampi extends React.Component {
             });
     }
 
-    listCampiByLuogo = async () => {
+    listCampiByLuogo = () => {
         if (this.state.searchLuogo != '') {
-            await fetch('https://campettiamo.herokuapp.com/api/v1/campi-luogo?luogo=' + this.state.searchLuogo + '&raggio=' + this.state.raggio, {
-                method: 'GET',
-                headers: new Headers({
-                    'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQ3MDQ0MSwiZXhwIjoxNjUzNTU2ODQxfQ.PDadY9oaX33e-_BclHoQ7s_9kzY4jxKJqBZRNbkfvVs',
-                    'Content-Type': 'application/json'
-                })
-            })
-                .then(response => response.json())
+            apiCall(tempToken, "campi-luogo", "GET", [{name:"luogo", value:this.state.searchLuogo},
+                {name:"raggio", value:this.state.raggio}], null)
                 .then(responseJson => {
                     this.setState({
                         campiLuogo: responseJson,
@@ -144,18 +135,12 @@ class ListaCampi extends React.Component {
                     Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
                 });
         } else {
-            await fetch('https://campettiamo.herokuapp.com/api/v1/campi-raggio?lat=' + this.state.latitude + '&lng=' + this.state.longitude + '&raggio=' + this.state.raggio, {
-                method: 'GET',
-                headers: new Headers({
-                    'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQ3MDQ0MSwiZXhwIjoxNjUzNTU2ODQxfQ.PDadY9oaX33e-_BclHoQ7s_9kzY4jxKJqBZRNbkfvVs',
-                    'Content-Type': 'application/json'
-                })
-            })
-                .then(response => response.json())
+            apiCall(tempToken, "campi-raggio", "GET", [{name:"lat", value:this.state.latitude}, 
+                {name:"lng", value:this.state.longitude}, {name:"raggio", value:this.state.raggio}], null)
                 .then(responseJson => {
                     this.setState({
                         campiLuogo: responseJson,
-                    })
+                    }) 
                 })
                 .catch(() => {
                     Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
@@ -279,11 +264,11 @@ class ListaCampi extends React.Component {
                             textAlign: 'center',
                             width: '40%',
 
-                        }}>Raggio</Text>
+                        }}>Distanza (km)</Text>
                         <InputSpinner style={{
                             width: '40%',
                             marginVertical: '1%'
-                        }} min={1} max={10} value={this.state.raggio} onChange={(value) => {
+                        }} min={1} max={100} value={this.state.raggio} onChange={(value) => {
                             this.setState({ raggio: value }, async () => {
                                 await this.listCampiByLuogo();
                             })

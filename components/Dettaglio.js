@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { Calendar } from 'react-native-calendars';
 import { Text, SafeAreaView } from 'react-native';
+import { apiCall } from './utils';
+
+const tempToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQ3MDQ0MSwiZXhwIjoxNjUzNTU2ODQxfQ.PDadY9oaX33e-_BclHoQ7s_9kzY4jxKJqBZRNbkfvVs";
 
 class Dettaglio extends React.Component {
     constructor(props) {
@@ -17,15 +20,8 @@ class Dettaglio extends React.Component {
         this.infoCampoDaID(this.state.id)
     }
 
-    infoCampoDaID = async (id) => {
-        return await fetch('https://campettiamo.herokuapp.com/api/v1/campo/' + id, {
-            method: 'GET',
-            headers: new Headers({
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQ3MDQ0MSwiZXhwIjoxNjUzNTU2ODQxfQ.PDadY9oaX33e-_BclHoQ7s_9kzY4jxKJqBZRNbkfvVs',
-                'Content-Type': 'application/json'
-            })
-        })
-            .then(response => response.json())
+    infoCampoDaID = (id) => {
+        apiCall(tempToken, "campo/"+id, "GET", null, null)
             .then(responseJson => {
                 this.setState({ info: responseJson })
             })
@@ -87,39 +83,33 @@ class Dettaglio extends React.Component {
         )
     }
 
-    slots = async (year, month) => {
+    slots = (year, month) => {
 
         let month_padded = (month < 10) ? '0' + month : month;
+        apiCall(tempToken, "campo/"+this.state.id+"/slot/mese/"+year+"-"+month_padded, "GET", null, null)
+        .then(giorni => {
+            let lista_giorni = {}
 
-        const giorni = await fetch('https://campettiamo.herokuapp.com/api/v1/campo/' + this.state.id + '/slot/mese/' + year + '-' + month_padded, {
-            method: 'GET',
-            headers: new Headers({
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQ3MDQ0MSwiZXhwIjoxNjUzNTU2ODQxfQ.PDadY9oaX33e-_BclHoQ7s_9kzY4jxKJqBZRNbkfvVs',
-                'Content-Type': 'application/json'
-            })
-        }).then(response => response.json())
+            let today = new Date();
+            let lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-        let lista_giorni = {}
-
-        let today = new Date();
-        let lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
-        for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
-            let day_paddded = (i < 10) ? '0' + i : i;
-            // check if i is in giorni
-            if (giorni.find(giorno => giorno == i)) {
-                lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
-                    selected: true,
-                    selectedColor: '#72bb53',
-                }
-            } else {
-                lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
-                    disabled: true,
-                    disableTouchEvent: true,
+            for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+                let day_paddded = (i < 10) ? '0' + i : i;
+                // check if i is in giorni
+                if (giorni.find(giorno => giorno == i)) {
+                    lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
+                        selected: true,
+                        selectedColor: '#72bb53',
+                    }
+                } else {
+                    lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
+                        disabled: true,
+                        disableTouchEvent: true,
+                    }
                 }
             }
-        }
-        this.setState({days: lista_giorni})
+            this.setState({days: lista_giorni})
+        })
     }
 }
 
