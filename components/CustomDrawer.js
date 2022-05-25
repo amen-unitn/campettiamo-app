@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { View, Image, Dimensions, ImageBackground } from 'react-native';
+import { SafeAreaView, Image, Dimensions, ImageBackground } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 
 const CustomDrawer = (props) => {
     return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
             <ImageBackground style={{
                 backgroundColor: '#72bb53', // or '#72bb53'
             }}
@@ -20,7 +20,7 @@ const CustomDrawer = (props) => {
             <DrawerContentScrollView {...props}>
                 <DrawerItemList {...props} />
             </DrawerContentScrollView>
-        </View>
+        </SafeAreaView>
     )
 }
 
