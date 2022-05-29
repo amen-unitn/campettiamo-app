@@ -34,7 +34,7 @@ class CustomDrawer extends React.Component {
     render() {
 
         return (
-            <Drawer.Navigator initialRouteName="Cerca campi" drawerContent={props => <this.CustomImg {...props} />}
+            <Drawer.Navigator useLegacyImplementation={true} initialRouteName="Cerca campi" drawerContent={props => <this.CustomImg {...props} />}
                 screenOptions={{
                     drawerActiveBackgroundColor: '#72bb53',
                     drawerActiveTintColor: '#fff',
