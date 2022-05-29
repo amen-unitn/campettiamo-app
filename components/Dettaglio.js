@@ -16,7 +16,7 @@ class Dettaglio extends React.Component {
             month: new Date().getMonth() + 1,
             days: {},
             disable_all_days: {}
-       }
+        }
         this.slots(this.state.year, this.state.month)
         this.infoCampoDaID(this.state.id)
     }
@@ -29,25 +29,26 @@ class Dettaglio extends React.Component {
 
     componentWillUnmount() {
         // fix Warning: Can't perform a React state update on an unmounted component
-        this.setState = (state,callback)=>{
+        this.setState = (state, callback) => {
             return;
         };
     }
 
-    async getToken(){
-        if(!this.state.token)
+    async getToken() {
+        if (!this.state.token)
             this.state.token = await AsyncStorage.getItem('TOKEN');
         return this.state.token;
     }
 
     infoCampoDaID = async (id) => {
-        apiCall(await this.getToken(), "campo/"+id, "GET", null, null,
+        apiCall(await this.getToken(), "campo/" + id, "GET", null, null,
             responseJson => {
                 this.setState({ info: responseJson.data })
             }, null, this.navigation)
     }
 
     componentDidMount() {
+        this.disableAllSlots(this.state.year, this.state.month);
         this.infoCampoDaID(this.state.id)
         this.disableAllSlots(this.state.year, this.state.month);
         this.setState({ year: new Date().getFullYear() })
@@ -80,7 +81,7 @@ class Dettaglio extends React.Component {
                         marginBottom: '25%',
                         marginHorizontal: '5%',
                     }}
-                        onMonthChange={ (date) => {
+                        onMonthChange={(date) => {
                             this.setState({ month: date.month })
                         }}
                         markedDates={this.state.days || this.state.disable_all_days}
@@ -100,31 +101,31 @@ class Dettaglio extends React.Component {
     slots = async (year, month) => {
 
         let month_padded = (month < 10) ? '0' + month : month;
-        apiCall(await this.getToken(), "campo/"+this.state.id+"/slot/mese/"+year+"-"+month_padded, "GET", null, null,
-        res => {
-            let giorni = res.data;
-            let lista_giorni = {}
+        apiCall(await this.getToken(), "campo/" + this.state.id + "/slot/mese/" + year + "-" + month_padded, "GET", null, null,
+            res => {
+                let giorni = res.data;
+                let lista_giorni = {}
 
-            let today = new Date();
-            let lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                let today = new Date();
+                let lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-            for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
-                let day_paddded = (i < 10) ? '0' + i : i;
-                // check if i is in giorni
-                if (giorni.find(giorno => giorno == i)) {
-                    lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
-                        selected: true,
-                        selectedColor: '#72bb53',
-                    }
-                } else {
-                    lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
-                        disabled: true,
-                        disableTouchEvent: true,
+                for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+                    let day_paddded = (i < 10) ? '0' + i : i;
+                    // check if i is in giorni
+                    if (giorni.find(giorno => giorno == i)) {
+                        lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
+                            selected: true,
+                            selectedColor: '#72bb53',
+                        }
+                    } else {
+                        lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
+                            disabled: true,
+                            disableTouchEvent: true,
+                        }
                     }
                 }
-            }
-            this.setState({days: lista_giorni})
-        }, null, this.navigation)
+                this.setState({ days: lista_giorni })
+            }, null, this.navigation)
     }
 
     disableAllSlots = (year, month) => {
@@ -144,7 +145,55 @@ class Dettaglio extends React.Component {
             }
         }
         this.setState({ disable_all_days: lista_giorni })
+        disableAllSlots = (year, month) => {
+            let month_padded = (month < 10) ? '0' + month : month;
+
+            let lista_giorni = {}
+
+            let today = new Date();
+            let lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+            for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+                let day_paddded = (i < 10) ? '0' + i : i;
+                // check if i is in giorni
+                lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
+                    disabled: true,
+                    disableTouchEvent: true,
+                }
+            }
+            this.setState({ disable_all_days: lista_giorni })
+        }
+
+        slots = (year, month) => {
+
+            let month_padded = (month < 10) ? '0' + month : month;
+            apiCall(tempToken, "campo/" + this.state.id + "/slot/mese/" + year + "-" + month_padded, "GET", null, null)
+                .then(giorni => {
+                    let lista_giorni = {}
+
+                    let today = new Date();
+                    let lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+                    for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+                        let day_paddded = (i < 10) ? '0' + i : i;
+                        // check if i is in giorni
+                        if (giorni.data.find(giorno => giorno == i)) {
+                            lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
+                                selected: true,
+                                selectedColor: '#72bb53',
+                            }
+                        } else {
+                            lista_giorni[year + '-' + month_padded + '-' + day_paddded] = {
+                                disabled: true,
+                                disableTouchEvent: true,
+                            }
+                        }
+                    }
+                    this.setState({ days: lista_giorni })
+                })
+        }
     }
+
 }
 
 module.exports = Dettaglio;

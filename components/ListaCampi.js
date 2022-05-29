@@ -42,6 +42,8 @@ class ListaCampi extends React.Component {
     componentDidMount() {
         this.get_current_location();
         this.setState({ refresh: false });
+        this.listCampiByLuogo();
+        this.listCampiByNome();
     }
 
     componentWillUnmount() {
@@ -227,8 +229,8 @@ class ListaCampi extends React.Component {
                         region={{
                             latitude: this.state.latitude,
                             longitude: this.state.longitude,
-                            latitudeDelta: this.state.latitude!=0?this.state.latitudeDelta:90,
-                            longitudeDelta: this.state.latitudeDelta!=0?this.state.longitudeDelta:180 
+                            latitudeDelta: this.state.latitude != 0 ? this.state.latitudeDelta : 90,
+                            longitudeDelta: this.state.latitudeDelta != 0 ? this.state.longitudeDelta : 180
                         }}
                         onRegionChangeComplete={(region) => { // check if position is now avaiable
 

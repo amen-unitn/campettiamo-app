@@ -35,8 +35,6 @@ const DettaglioCampo = ({ route, navigation }) => {
 
 const SearchCampi = ({ navigation }) => {
 
-
-
     return (
         <Tab.Navigator initialRouteName='Cerca per nome' options={{
 

@@ -1,5 +1,4 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { createDrawerNavigator } from '@react-navigation/drawer';
 
 styles = StyleSheet.create({
   container: {

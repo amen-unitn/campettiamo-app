@@ -3,6 +3,7 @@ import { SafeAreaView, Image, Dimensions, ImageBackground } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList, createDrawerNavigator } from '@react-navigation/drawer';
 import ShowCampi from './CercaCampi';
 import Logout from './Logout';
+import ShowInfoMieiCampi from './MieiCampi';
 const Drawer = createDrawerNavigator();
 
 class CustomDrawer extends React.Component {
@@ -40,6 +41,13 @@ class CustomDrawer extends React.Component {
                 }}
             >
                 <Drawer.Screen name="Cerca campi" component={ShowCampi} options={{
+                    headerStyle: { backgroundColor: '#72bb53' },
+                    headerTitleStyle: { color: 'white' },
+                    headerTitleAlign: 'center',
+                    headerTintColor: 'white'
+                }}
+                />
+                <Drawer.Screen name="I miei campi" component={ShowInfoMieiCampi} options={{
                     headerStyle: { backgroundColor: '#72bb53' },
                     headerTitleStyle: { color: 'white' },
                     headerTitleAlign: 'center',
