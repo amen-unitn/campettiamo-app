@@ -1,27 +1,56 @@
 import * as React from 'react';
-import { View, Image, Dimensions, ImageBackground } from 'react-native';
-import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { SafeAreaView, Image, Dimensions, ImageBackground } from 'react-native';
+import { DrawerContentScrollView, DrawerItemList, createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
+import ShowCampi from './CercaCampi';
+const Drawer = createDrawerNavigator();
 
-const CustomDrawer = (props) => {
-    return (
-        <View style={{ flex: 1 }}>
-            <ImageBackground style={{
-                backgroundColor: '#72bb53', // or '#72bb53'
-            }}
+class CustomDrawer extends React.Component {
+
+    CustomImg = (props) => {
+        return (
+            <SafeAreaView style={{ flex: 1 }}>
+                <ImageBackground style={{
+                    backgroundColor: '#72bb53', // or '#72bb53'
+                }}
+                >
+                    <Image source={require('../assets/logo.png')} style={{
+                        width: '50%',
+                        alignSelf: 'center',
+                        height: Dimensions.get('window').height / 6,
+                        marginTop: '10%',
+                        marginBottom: '10%',
+                    }} />
+                </ImageBackground>
+                <DrawerContentScrollView {...props}>
+                    <DrawerItemList {...props} />
+                </DrawerContentScrollView>
+            </SafeAreaView>
+        )
+    }
+
+
+    render() {
+        return (
+            <Drawer.Navigator initialRouteName="Cerca campi" drawerContent={props => <this.CustomImg {...props} />}
+                screenOptions={{
+                    drawerActiveBackgroundColor: '#72bb53',
+                    drawerActiveTintColor: '#fff',
+                }}
             >
-                <Image source={require('../assets/logo.png')} style={{
-                    width: '50%',
-                    alignSelf: 'center',
-                    height: Dimensions.get('window').height / 6,
-                    marginTop: '10%',
-                    marginBottom: '10%',
-                }} />
-            </ImageBackground>
-            <DrawerContentScrollView {...props}>
-                <DrawerItemList {...props} />
-            </DrawerContentScrollView>
-        </View>
-    )
+                <Drawer.Screen name="Cerca campi" component={ShowCampi} options={{
+                    headerStyle: { backgroundColor: '#72bb53' },
+                    headerTitleStyle: { color: 'white' },
+                    headerTitleAlign: 'center',
+                    headerTintColor: 'white'
+                }}
+                />
+
+            </Drawer.Navigator>
+        );
+    }
 }
+
+
 
 module.exports = CustomDrawer;
