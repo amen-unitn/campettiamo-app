@@ -5,6 +5,10 @@ import { Text } from 'react-native';
 import Dettaglio from './Dettaglio';
 import ListaCampi from './ListaCampi';
 
+
+import { requestOneTimePayment, requestBillingAgreement } from 'react-native-paypal'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 
@@ -19,7 +23,26 @@ const ShowCampi = () => {
     )
 }
 
-const SlotsDisponibili = ({ route, navigation }) => {
+const SlotsDisponibili = async ({ route, navigation }) => {
+
+    const {
+        nonce,
+        payerId,
+        email,
+        firstName,
+        lastName,
+        phone
+    } = await requestBillingAgreement(
+      await AsyncStorage.getItem('PAYPAL'),
+      {
+        billingAgreementDescription: 'Ghe sboro', // required
+        // any PayPal supported currency (see here: https://developer.paypal.com/docs/integration/direct/rest/currency-codes/#paypal-account-payments)
+        currency: 'EUR',
+        // any PayPal supported locale (see here: https://braintree.github.io/braintree_ios/Classes/BTPayPalRequest.html#/c:objc(cs)BTPayPalRequest(py)localeCode)
+        localeCode: 'it_IT',
+      }
+    );
+
     return (
         <>
             <Text>Slots disponibili</Text>

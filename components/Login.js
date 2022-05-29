@@ -28,6 +28,7 @@ class Login extends React.Component {
       if (response.success == true) {
         await AsyncStorage.setItem('TOKEN', response.token);
         await AsyncStorage.setItem('TIPOLOGIA', response.tipologia)
+        await AsyncStorage.setItem('PAYPAL', response.paypal_client_token)
         this.navigation.navigate('App');
       } else {
         Alert.alert("Errore", "Username o password non validi");

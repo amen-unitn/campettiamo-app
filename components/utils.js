@@ -1,5 +1,5 @@
-const BASE_URL = "https://campettiamo.herokuapp.com/api/v1/"
-//const BASE_URL = "http://192.168.1.111:9080/api/v1/";
+// const BASE_URL = "https://campettiamo.herokuapp.com/api/v1/"
+const BASE_URL = "http://192.168.43.113:9080/api/v1";
 
 import { Alert } from 'react-native';
 
