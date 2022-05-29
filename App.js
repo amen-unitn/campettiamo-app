@@ -1,4 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
+import { StatusBar } from 'react-native';
 import CustomDrawer from './components/CustomDrawer';
 import Login from './components/Login';
 import Registrazione from './components/Registrazione';
@@ -15,7 +16,8 @@ export default function App() {
   }
 
   return (
-
+    <>
+    <StatusBar animated={true} barStyle='default' backgroundColor='#72bb53' />
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
           <Stack.Screen name='Login' component={StartApp} />
@@ -23,7 +25,7 @@ export default function App() {
           <Stack.Screen name='App' component={CustomDrawer} />
       </Stack.Navigator>
     </NavigationContainer>
-
+    </>
   );
 
 }
