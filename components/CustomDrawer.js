@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { SafeAreaView, Image, Dimensions, ImageBackground } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList, createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
 import ShowCampi from './CercaCampi';
+import Logout from './Logout';
 const Drawer = createDrawerNavigator();
 
 class CustomDrawer extends React.Component {
@@ -31,6 +31,7 @@ class CustomDrawer extends React.Component {
 
 
     render() {
+
         return (
             <Drawer.Navigator initialRouteName="Cerca campi" drawerContent={props => <this.CustomImg {...props} />}
                 screenOptions={{
@@ -39,6 +40,14 @@ class CustomDrawer extends React.Component {
                 }}
             >
                 <Drawer.Screen name="Cerca campi" component={ShowCampi} options={{
+                    headerStyle: { backgroundColor: '#72bb53' },
+                    headerTitleStyle: { color: 'white' },
+                    headerTitleAlign: 'center',
+                    headerTintColor: 'white'
+                }}
+                />
+
+                <Drawer.Screen name="Logout" component={Logout} options={{
                     headerStyle: { backgroundColor: '#72bb53' },
                     headerTitleStyle: { color: 'white' },
                     headerTitleAlign: 'center',
