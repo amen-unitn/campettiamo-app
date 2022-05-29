@@ -20,9 +20,19 @@ class ListaCampi extends React.Component {
         this.getCampi();
     }
 
-    componentDidMount() {
-        this.getCampi();
+    async componentDidMount() {
+        await this.getCampi();
         this.setState({ refresh: false });
+        this.focusListener = this.props.navigation.addListener('focus', async () => {
+            await this.getCampi();
+        });
+    }
+
+    componentWillUnmount() {
+        // fix Warning: Can't perform a React state update on an unmounted component
+        this.setState = (state, callback) => {
+            return;
+        };
     }
 
     async getToken() {
@@ -108,6 +118,46 @@ class CreaNuovoCampo extends React.Component {
         if (!this.state.token)
             this.state.token = await AsyncStorage.getItem('TOKEN');
         return this.state.token;
+    }
+
+    async createCampo() {
+        // check if all fields are filled
+        if (this.state.nome === '' || this.state.indirizzo === '' || this.state.cap === '' || this.state.citta === '' || this.state.provincia === '' || this.state.sport === '' || this.state.tariffa === '' || this.state.prenotaEntro === '') {
+            Alert.alert('Attenzione', 'Compilare tutti i campi');
+        } else {
+            // check if is a number
+            if (isNaN(this.state.cap) || isNaN(this.state.tariffa) || isNaN(this.state.prenotaEntro)) {
+                Alert.alert('Attenzione', 'Il CAP, la tariffa e la prenota entro devono essere numeri');
+            } else {
+                // check if is a 5 digits number
+                if (this.state.cap.length !== 5 || isNaN(this.state.cap.slice(-1))) {
+                    Alert.alert('Attenzione', 'Il CAP deve essere di 5 cifre');
+                }
+                // check if is a number
+                else {
+                    apiCall(await this.getToken(), 'campo/', 'POST', null, {
+                        nome: this.state.nome,
+                        indirizzo: this.state.indirizzo,
+                        cap: this.state.cap,
+                        citta: this.state.citta,
+                        provincia: this.state.provincia,
+                        sport: this.state.sport,
+                        tariffa: this.state.tariffa,
+                        prenotaEntro: this.state.prenotaEntro
+                    }, (res) => {
+                        if (res.success) {
+                            Alert.alert('Campo creato con successo');
+                            this.navigation.goBack();
+                        } else {
+                            Alert.alert('Attenzione', res.message);
+                        }
+                    }, (err) => {
+                        console.log(err)
+                        Alert.alert('Attenzione', err.message);
+                    }, null);
+                }
+            }
+        }
     }
 
     render() {
@@ -199,45 +249,7 @@ class CreaNuovoCampo extends React.Component {
                             />
                         </SafeAreaView>
                         <SafeAreaView style={styles.crea}>
-                            <Button color='#72bb53' title='Crea' onPress={async () => {
-                                // check if all fields are filled
-                                if (this.state.nome === '' || this.state.indirizzo === '' || this.state.cap === '' || this.state.citta === '' || this.state.provincia === '' || this.state.sport === '' || this.state.tariffa === '' || this.state.prenotaEntro === '') {
-                                    Alert.alert('Attenzione', 'Compilare tutti i campi');
-                                } else {
-                                    // check if is a number
-                                    if (isNaN(this.state.cap) || isNaN(this.state.tariffa) || isNaN(this.state.prenotaEntro)) {
-                                        Alert.alert('Attenzione', 'Il CAP, la tariffa e la prenota entro devono essere numeri');
-                                    } else {
-                                        // check if is a 5 digits number
-                                        if (this.state.cap.length !== 5 || isNaN(this.state.cap.slice(-1))) {
-                                            Alert.alert('Attenzione', 'Il CAP deve essere di 5 cifre');
-                                        }
-                                        // check if is a number
-                                        else {
-                                            apiCall(await this.getToken(), 'campo', 'POST', null, {
-                                                nome: this.state.nome,
-                                                indirizzo: this.state.indirizzo,
-                                                cap: this.state.cap,
-                                                citta: this.state.citta,
-                                                provincia: this.state.provincia,
-                                                sport: this.state.sport,
-                                                tariffa: this.state.tariffa,
-                                                prenotaEntro: this.state.prenotaEntro
-                                            }, ((res) => {
-                                                if (res.success) {
-                                                    Alert.alert('Campo creato con successo');
-                                                    this.navigation.goBack();
-                                                } else {
-                                                    Alert.alert('Attenzione', res.message);
-                                                }
-                                            }), ((err) => {
-                                                console.log(err)
-                                                Alert.alert('Attenzione', err.message);
-                                            }), null);
-                                        }
-                                    }
-                                }
-                            }} />
+                            <Button color='#72bb53' title='Crea' onPress={() => this.createCampo()} />
 
                         </SafeAreaView>
                     </SafeAreaView>

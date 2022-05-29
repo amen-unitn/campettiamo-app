@@ -28,7 +28,7 @@ class Login extends React.Component {
       if (response.success == true) {
         await AsyncStorage.setItem('TOKEN', response.token);
         await AsyncStorage.setItem('TIPOLOGIA', response.tipologia)
-        this.navigation.navigate('App');
+        this.navigation.navigate('App', {tipologia: response.tipologia});
       } else {
         Alert.alert("Errore", "Username o password non validi");
       }
@@ -38,8 +38,11 @@ class Login extends React.Component {
 
   async componentDidMount() {
     let token = await AsyncStorage.getItem('TOKEN');
-    if (token && token != "")
-      this.navigation.navigate('App');
+    if (token && token != ""){
+      let tipologia = await AsyncStorage.getItem('TIPOLOGIA');
+      this.navigation.navigate('App', {tipologia: tipologia});
+    }
+      
   }
 
   render() {
