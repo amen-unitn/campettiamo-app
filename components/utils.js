@@ -77,7 +77,19 @@ function apiCall(token, path, method, getParams, body, resolve, reject, navigati
  * @returns void
  */
 function loginRequest(email, pwd, resolve, reject){
-    return apiCall("", "utente/login", "POST", null, {email:email, password:pwd}, resolve, reject);
+    return apiCall("", "login", "POST", null, {email:email, password:pwd}, resolve, reject);
 }
 
-module.exports = {apiCall, loginRequest}
+
+function registerRequest(nome, cognome, email, pwd, paypal, telefono, tipologia, resolve, reject){
+    let path = "";
+    switch(tipologia){
+        case "Utente":{path = "utente"; break;}
+        case "Gestore":{path = "gestore";break;}
+    }
+    return apiCall("", path, "POST", null, {
+        nome:nome, cognome:cognome, email:email, paypal:paypal, telefono:telefono, password:pwd
+    }, resolve, reject);
+}
+
+module.exports = {apiCall, loginRequest, registerRequest}
