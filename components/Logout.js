@@ -12,6 +12,7 @@ class Logout extends React.Component {
     this.navigation.navigate('Login');
     await AsyncStorage.setItem('TOKEN', "");
     await AsyncStorage.setItem('TIPOLOGIA', "")
+    await AsyncStorage.setItem('EMAIL', "")
   }
 
   render() {

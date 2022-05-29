@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { SafeAreaView, Image, Dimensions, ImageBackground } from 'react-native';
+import { SafeAreaView, Image, Dimensions, ImageBackground, Text } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList, createDrawerNavigator } from '@react-navigation/drawer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ShowCampi from './CercaCampi';
 import Logout from './Logout';
 import ShowInfoMieiCampi from './MieiCampi';
@@ -14,10 +15,19 @@ class CustomDrawer extends React.Component {
         super(props);
         this.navigation = props.navigation;
         this.state = {
-            tipologia:props.route.params.tipologia
+            tipologia: props.route.params.tipologia,
+            email: props.route.params.email
         }
+        this.getNome();
+    }
 
-      }
+    getNome = async () => {
+        await AsyncStorage.getItem('EMAIL').then(
+            (value) => {
+                this.setState({ email: value });
+            }
+        );
+    }
 
     CustomImg = (props) => {
         return (
@@ -31,8 +41,16 @@ class CustomDrawer extends React.Component {
                         alignSelf: 'center',
                         height: Dimensions.get('window').height / 6,
                         marginTop: '10%',
-                        marginBottom: '10%',
                     }} />
+                    <SafeAreaView style={{
+                        marginBottom: '5%',
+                        alignItems: 'center'
+                    }}>
+                        <Text style={{
+                            color: 'white',
+                            fontWeight: 'bold'
+                        }}>{this.state.email}</Text>
+                    </SafeAreaView>
                 </ImageBackground>
                 <DrawerContentScrollView {...props}>
                     <DrawerItemList {...props} />
@@ -45,9 +63,9 @@ class CustomDrawer extends React.Component {
     render() {
 
         let view = null;
-        
-        switch(this.state.tipologia){
-            case "Utente":{
+
+        switch (this.state.tipologia) {
+            case "Utente": {
                 view = (
                     <Drawer.Navigator useLegacyImplementation={true} initialRouteName="Cerca campi" drawerContent={props => <this.CustomImg {...props} />}
                         screenOptions={{
@@ -62,14 +80,14 @@ class CustomDrawer extends React.Component {
                             headerTintColor: 'white'
                         }}
                         />
-                         <Drawer.Screen name="Le mie Prenotazioni" component={ShowMiePrenotazioni} options={{
+                        <Drawer.Screen name="Le mie Prenotazioni" component={ShowMiePrenotazioni} options={{
                             headerStyle: { backgroundColor: '#72bb53' },
                             headerTitleStyle: { color: 'white' },
                             headerTitleAlign: 'center',
                             headerTintColor: 'white'
                         }}
-                          />
-        
+                        />
+
                         <Drawer.Screen name="Gestione Account" component={GestisciAccount} options={{
                             headerStyle: { backgroundColor: '#72bb53' },
                             headerTitleStyle: { color: 'white' },
@@ -85,13 +103,13 @@ class CustomDrawer extends React.Component {
                             headerTintColor: 'white'
                         }}
                         />
-        
+
                     </Drawer.Navigator>
                 );
                 break;
 
             }
-            case "Gestore":{
+            case "Gestore": {
                 view = (
                     <Drawer.Navigator useLegacyImplementation={true} initialRouteName="I miei campi" drawerContent={props => <this.CustomImg {...props} />}
                         screenOptions={{
@@ -107,7 +125,7 @@ class CustomDrawer extends React.Component {
                             headerTintColor: 'white'
                         }}
                         />
-        
+
                         <Drawer.Screen name="Gestione Account" component={GestisciAccount} options={{
                             headerStyle: { backgroundColor: '#72bb53' },
                             headerTitleStyle: { color: 'white' },
@@ -123,14 +141,14 @@ class CustomDrawer extends React.Component {
                             headerTintColor: 'white'
                         }}
                         />
-        
+
                     </Drawer.Navigator>
                 );
                 break;
             }
         }
         return view;
-        
+
     }
 }
 

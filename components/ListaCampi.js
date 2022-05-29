@@ -224,7 +224,6 @@ class ListaCampi extends React.Component {
                     />
                     <MapView
                         showsUserLocation={true}
-                        provider={PROVIDER_GOOGLE}
                         style={styles.map}
                         region={{
                             latitude: this.state.latitude,

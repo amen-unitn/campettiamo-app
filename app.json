@@ -4,7 +4,7 @@
     "slug": "Campettiamo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -20,13 +20,19 @@
     "ios": {
       "supportsTablet": true,
       "config": {
-        "googleMapsApiKey": "AIzaSyAHvVUqzSD7mFoyoAQgur7dvKzL1Luz28s"
-      }
+        "googleMapsApiKey": "AIzaSyALEwICDNHqJerB0c9jEJaYrp273vtt1j0"
+      },
+      "bundleIdentifier": "com.mattia2700.Campettiamo"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#FFFFFF"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyALEwICDNHqJerB0c9jEJaYrp273vtt1j0"
+        }
       },
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.mattia2700.Campettiamo"
