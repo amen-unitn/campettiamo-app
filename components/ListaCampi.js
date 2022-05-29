@@ -7,8 +7,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import InputSpinner from 'react-native-input-spinner'
 import * as Location from 'expo-location';
 import { apiCall } from './utils';
-
-const tempToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaS52ZXJkaUBnbWFpbC5jb20iLCJpZCI6IjgwZWIzYWZhLWExY2YtNDE5YS1iYjJjLTI1NDJlNWRmOGY1NyIsInRpcG9sb2dpYSI6IlV0ZW50ZSIsImlhdCI6MTY1MzQ3MDQ0MSwiZXhwIjoxNjUzNTU2ODQxfQ.PDadY9oaX33e-_BclHoQ7s_9kzY4jxKJqBZRNbkfvVs";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class ListaCampi extends React.Component {
     constructor(props) {
@@ -34,9 +33,22 @@ class ListaCampi extends React.Component {
         this.listCampiByLuogo();
     }
 
+    async getToken(){
+        if(!this.state.token)
+            this.state.token = await AsyncStorage.getItem('TOKEN');
+        return this.state.token;
+    }
+
     componentDidMount() {
         this.get_current_location();
         this.setState({ refresh: false });
+    }
+
+    componentWillUnmount() {
+        // fix Warning: Can't perform a React state update on an unmounted component
+        this.setState = (state,callback)=>{
+            return;
+        };
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -109,42 +121,56 @@ class ListaCampi extends React.Component {
         });
     }
 
-    listCampiByNome = () => {
+    listCampiByNome = async () => {
 
-        apiCall(tempToken, "campi-nome", "GET", [{name:"nome", value:this.state.searchNome}], null)
-            .then(responseJson => {
-                this.setState({
-                    campiNome: responseJson,
-                })
-            })
-            .catch(() => {
+        apiCall(await this.getToken(), "campi-nome", "GET", [{name:"nome", value:this.state.searchNome}], null,
+            responseJson => {
+                //console.log(responseJson);
+                if(responseJson.success){
+                    this.setState({
+                        campiNome: responseJson.data,
+                    })
+                }else{
+                    Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
+                }
+                
+            },
+            () => {
                 Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
-            });
+            }, this.navigation);
     }
 
-    listCampiByLuogo = () => {
+    listCampiByLuogo = async () => {
         if (this.state.searchLuogo != '') {
-            apiCall(tempToken, "campi-luogo", "GET", [{name:"luogo", value:this.state.searchLuogo},
-                {name:"raggio", value:this.state.raggio}], null)
-                .then(responseJson => {
-                    this.setState({
-                        campiLuogo: responseJson,
-                    })
-                })
-                .catch(() => {
+            apiCall(await this.getToken(), "campi-luogo", "GET", [{name:"luogo", value:this.state.searchLuogo},
+                {name:"raggio", value:this.state.raggio}], null,
+                responseJson => {
+                    if(responseJson.success){
+                        this.setState({
+                            campiLuogo: responseJson.data,
+                        })
+                    }else{
+                        Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
+                    }
+                },
+                () => {
                     Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
-                });
+                }, this.navigation);
         } else {
-            apiCall(tempToken, "campi-raggio", "GET", [{name:"lat", value:this.state.latitude}, 
-                {name:"lng", value:this.state.longitude}, {name:"raggio", value:this.state.raggio}], null)
-                .then(responseJson => {
-                    this.setState({
-                        campiLuogo: responseJson,
-                    }) 
-                })
-                .catch(() => {
+            apiCall(await this.getToken(), "campi-raggio", "GET", [{name:"lat", value:this.state.latitude}, 
+                {name:"lng", value:this.state.longitude}, {name:"raggio", value:this.state.raggio}], null,
+                responseJson => {
+                    if(responseJson.success){
+                        this.setState({
+                            campiLuogo: responseJson.data,
+                        })
+                    }else{
+                        Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
+                    }
+                },
+                () => {
                     Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
-                });
+                }, this.navigation);
         }
     }
 

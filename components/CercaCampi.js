@@ -8,6 +8,7 @@ import ListaCampi from './ListaCampi';
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 
+
 const ShowCampi = () => {
     return (
         <Stack.Navigator initialRouteName='Campi' screenOptions={{ headerShown: false }}>
@@ -33,6 +34,9 @@ const DettaglioCampo = ({ route, navigation }) => {
 }
 
 const SearchCampi = ({ navigation }) => {
+
+
+
     return (
         <Tab.Navigator initialRouteName='Cerca per nome' options={{
 
