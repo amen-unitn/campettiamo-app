@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - test_workflow
   pull_request:
     branches:
       - main
@@ -44,7 +43,5 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git rm -r --ignore-unmatch */*
-          cp -r /tmp/workspace/* .
-          git add .
+          git add /tmp/worksapce
           if [[ $(git status --porcelain) ]]; then git commit -am "chore: automatically generated files" && git push; fi
