@@ -5,7 +5,7 @@ on:
     branches:
       - test_workflow
 
-  jobs:
+jobs:
     - name: Checkout release branch
       uses: actions/checkout@v2
       with:
