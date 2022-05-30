@@ -27,7 +27,6 @@ jobs:
         with:
           expo-version: latest
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
         run: yarn install
@@ -41,7 +40,7 @@ jobs:
           ref: build
       
       - name: Push generated app
-      - run: |
+        run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git rm -r --ignore-unmatch */*
