@@ -49,7 +49,6 @@ styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: '2%',
-    marginBottom: '2%',
   },
   colonna: {
     flexDirection: 'column',
@@ -80,6 +79,12 @@ styles = StyleSheet.create({
   },
   crea: {
     marginTop: '5%',
+  },
+  btnCont:{
+    width: "80%",
+    justifyContent: "center",
+    color: "#61c238",
+    marginTop: '2%'
   }
 });
 

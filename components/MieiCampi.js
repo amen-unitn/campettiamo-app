@@ -9,7 +9,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator();
 
-class ListaCampi extends React.Component {
+const PropCampo = ({ route, navigation }) => {
+    return (
+        <ModificaCampo campo={route.params.campo} navigation={navigation} />
+    )
+}
+
+const NuovoCampo = ({ route, navigation }) => {
+    return (
+        <CreaNuovoCampo navigation={navigation} />
+    )
+}
+
+const ShowMieiCampi = ({ route, navigation }) => {
+    return (
+        <MieiCampi navigation={navigation} />
+    )
+}
+
+class MieiCampi extends React.Component {
     constructor(props) {
         super(props);
         this.navigation = props.navigation;
@@ -152,7 +170,6 @@ class CreaNuovoCampo extends React.Component {
                             Alert.alert('Attenzione', res.message);
                         }
                     }, (err) => {
-                        console.log(err)
                         Alert.alert('Attenzione', err.message);
                     }, null);
                 }
@@ -229,7 +246,7 @@ class CreaNuovoCampo extends React.Component {
                             />
                         </SafeAreaView>
                         <SafeAreaView style={styles.testo}>
-                            <Text style={styles.proprieta}>Tariffa</Text>
+                            <Text style={styles.proprieta}>Tariffa (€)</Text>
                         </SafeAreaView>
                         <SafeAreaView style={styles.field}>
                             <TextInput
@@ -239,7 +256,7 @@ class CreaNuovoCampo extends React.Component {
                             />
                         </SafeAreaView>
                         <SafeAreaView style={styles.testo}>
-                            <Text style={styles.proprieta}>Prenota entro</Text>
+                            <Text style={styles.proprieta}>Prenota entro (ore)</Text>
                         </SafeAreaView>
                         <SafeAreaView style={styles.field}>
                             <TextInput
@@ -259,6 +276,201 @@ class CreaNuovoCampo extends React.Component {
     }
 }
 
+class ModificaCampo extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.navigation = props.navigation;
+        this.state = {
+            id: props.campo,
+            nome: '',
+            indirizzo: '',
+            cap: '',
+            citta: '',
+            provincia: '',
+            sport: '',
+            tariffa: '',
+            prenotaEntro: ''
+        }
+    }
+
+    async getToken() {
+        if (!this.state.token)
+            this.state.token = await AsyncStorage.getItem('TOKEN');
+        return this.state.token;
+    }
+
+    async getActualData() {
+        apiCall(await this.getToken(), "campo/" + this.state.id, "GET", null, null, res => {
+            if (res.data) {
+                this.setState({
+                    nome: res.data.nome,
+                    indirizzo: res.data.indirizzo,
+                    cap: res.data.cap,
+                    citta: res.data.citta,
+                    provincia: res.data.provincia,
+                    sport: res.data.sport,
+                    tariffa: res.data.tariffa,
+                    prenotaEntro: res.data.prenotaEntro
+                })
+            }
+        }, err => { }, this.navigation);
+    }
+
+    async componentDidMount() {
+        await this.getActualData();
+    }
+
+    async modifica() {
+        if (this.state.nome == '' || this.state.indirizzo == '' || this.state.cap == '' ||
+            this.state.citta == '' || this.state.provincia == '' || this.state.sport == '' ||
+            this.state.tariffa == '' || this.state.prenotaEntro == '') {
+            Alert.alert("Errore", "Tutti i campi sono obbligatori. Completali.")
+        } else {
+            let capReg = /^[0-9]{5}$/;
+            // match positive float/integer
+            let positiveNumReg = /^\d*\.?\d*$/;
+            if (capReg.test(this.state.cap) === false) {
+                Alert.alert("Errore", "Il CAP deve essere un numero di 5 cifre.");
+            } else if (positiveNumReg.test(this.state.tariffa) === false || positiveNumReg.test(this.state.prenotaEntro) === false) {
+                Alert.alert("Errore", "La tariffa e prenota entro devono essere numeri positivi.");
+            } else {
+                apiCall(await this.getToken(), "campo/" + this.state.id, "PUT", null, {
+                    nome: this.state.nome,
+                    indirizzo: this.state.indirizzo,
+                    cap: this.state.cap,
+                    citta: this.state.citta,
+                    provincia: this.state.provincia,
+                    sport: this.state.sport,
+                    tariffa: this.state.tariffa,
+                    prenotaEntro: this.state.prenotaEntro
+                }, (res) => {
+                    if (res.success == true) {
+                        Alert.alert("Modifica completata", "Campo aggiornato con successo");
+                        this.navigation.goBack();
+                    } else {
+                        Alert.alert("Errore", "Errore durante la modifica, riprova!");
+                    }
+                }, (err) => { }, this.navigation);
+            }
+        }
+    }
+
+    async elimina() {
+        apiCall(await this.getToken(), "campo/" + this.state.id, "DELETE", null, null, async (res) => {
+            if (res.success == true) {
+                Alert.alert("Operazione completata", "Campo cancellato con successo");
+                this.navigation.goBack();
+            } else {
+                Alert.alert("Errore", "Errore durante la cancellazione, riprova!");
+            }
+        }, (err) => { }, this.navigation);
+    }
+
+
+    render() {
+        return (
+            <>
+                <SafeAreaView style={styles.container}>
+                    <Text style={styles.titolo}>Modifica Account</Text>
+                    <SafeAreaView style={styles.colonna}>
+                        <SafeAreaView style={styles.testo}>
+                            <Text style={styles.proprieta}>Nome</Text>
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.field}>
+                            <TextInput
+                                style={styles.input}
+                                value={this.state.nome}
+                                onChangeText={(nome) => this.setState({ nome })}
+                            />
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.testo}>
+                            <Text style={styles.proprieta}>Indirizzo</Text>
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.field}>
+                            <TextInput
+                                style={styles.input}
+                                value={this.state.indirizzo}
+                                onChangeText={(indirizzo) => this.setState({ indirizzo })}
+                            />
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.testo}>
+                            <Text style={styles.proprieta}>CAP</Text>
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.field}>
+                            <TextInput
+                                style={styles.input}
+                                value={this.state.cap}
+                                onChangeText={(cap) => this.setState({ cap })}
+                            />
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.testo}>
+                            <Text style={styles.proprieta}>Città</Text>
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.field}>
+                            <TextInput
+                                style={styles.input}
+                                value={this.state.citta}
+                                onChangeText={(citta) => this.setState({ citta })}
+                            />
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.testo}>
+                            <Text style={styles.proprieta}>Provincia</Text>
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.field}>
+                            <TextInput
+                                style={styles.input}
+                                value={this.state.provincia}
+                                onChangeText={(provincia) => this.setState({ provincia })}
+                            />
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.testo}>
+                            <Text style={styles.proprieta}>Sport</Text>
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.field}>
+                            <TextInput
+                                style={styles.input}
+                                value={this.state.sport}
+                                onChangeText={(sport) => this.setState({ sport })}
+                            />
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.testo}>
+                            <Text style={styles.proprieta}>Tariffa (€)</Text>
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.field}>
+                            <TextInput
+                                style={styles.input}
+                                value={this.state.tariffa}
+                                onChangeText={(tariffa) => this.setState({ tariffa })}
+                            />
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.testo}>
+                            <Text style={styles.proprieta}>Prenota entro (ore)</Text>
+                        </SafeAreaView>
+                        <SafeAreaView style={styles.field}>
+                            <TextInput
+                                style={styles.input}
+                                value={this.state.prenotaEntro}
+                                onChangeText={(prenotaEntro) => this.setState({ prenotaEntro })}
+                            />
+                        </SafeAreaView>
+
+
+                    </SafeAreaView>
+                    <SafeAreaView style={styles.btnCont}>
+                        <Button color='#72bb53' title='Aggiorna' onPress={() => this.modifica()} />
+                    </SafeAreaView>
+
+                    <SafeAreaView style={styles.btnCont}>
+                        <Button color='#e0a00b' title='Elimina campo' onPress={() => this.elimina()} />
+                    </SafeAreaView>
+                </SafeAreaView>
+            </>
+        );
+    }
+
+}
+
 const ShowInfoMieiCampi = () => {
     return (
         <Stack.Navigator initialRouteName='Miei Campi' screenOptions={{ headerShown: false }}>
@@ -266,26 +478,6 @@ const ShowInfoMieiCampi = () => {
             <Stack.Screen name='Proprietà campo' component={PropCampo} />
             <Stack.Screen name='Nuovo campo' component={NuovoCampo} />
         </Stack.Navigator>
-    )
-}
-
-const PropCampo = () => {
-    return (
-        <Text>
-            Proprietà campo
-        </Text>
-    )
-}
-
-const NuovoCampo = ({ route, navigation }) => {
-    return (
-        <CreaNuovoCampo navigation={navigation} />
-    )
-}
-
-const ShowMieiCampi = ({ route, navigation }) => {
-    return (
-        <ListaCampi navigation={navigation} />
     )
 }
 
