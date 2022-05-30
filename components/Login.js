@@ -51,9 +51,9 @@ class Login extends React.Component {
     return (
       <View style={styles.container}>
         <Image style={styles.image} source={require("../assets/logo.png")} />
+        <Text style={styles.titolo}>Login</Text>
 
-
-        <StatusBar style="auto" />
+        
         <View style={styles.inputView}>
           <TextInput
             style={styles.TextInput}
@@ -74,7 +74,7 @@ class Login extends React.Component {
         </View>
 
         <TouchableOpacity>
-          <Text style={styles.forgot_button}>Password dimenticata?</Text>
+          <Text style={styles.forgot_button} onPress={() => this.navigation.navigate('RecuperoPwd')}>Password dimenticata?</Text>
         </TouchableOpacity>
         <TouchableOpacity>
           <Text style={styles.forgot_button} onPress={() => this.navigation.navigate('Registrazione')}>Non hai un account? Registrati</Text>

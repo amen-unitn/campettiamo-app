@@ -7,7 +7,12 @@ const styles = StyleSheet.create({
       alignItems: "center",
       justifyContent: "center",
     },
-   
+    titolo: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginTop: '2%',
+      marginBottom: '5%',
+    },
     image: {
       alignSelf: 'center',
       aspectRatio: 1,
