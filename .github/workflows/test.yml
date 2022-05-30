@@ -7,9 +7,9 @@ on:
 
   jobs:
     - name: Checkout release branch
-        uses: actions/checkout@v2
-        with:
-          ref: build
+      uses: actions/checkout@v2
+      with:
+        ref: build
       
       - name: Push generated app
         run: |
