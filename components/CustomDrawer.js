@@ -6,7 +6,8 @@ import ShowCampi from './CercaCampi';
 import Logout from './Logout';
 import ShowInfoMieiCampi from './MieiCampi';
 import GestisciAccount from './GestisciAccount';
-import ShowMiePrenotazioni from './MiePrenotazioni';
+import ShowMiePrenotazioni from './PrenotazioniCampo';
+
 const Drawer = createDrawerNavigator();
 
 class CustomDrawer extends React.Component {
@@ -125,6 +126,15 @@ class CustomDrawer extends React.Component {
                             headerTintColor: 'white'
                         }}
                         />
+
+                        <Drawer.Screen name="Prenotazioni Campo" component={ShowPrenotazioniCampo} options={{
+                            headerStyle: { backgroundColor: '#72bb53' },
+                            headerTitleStyle: { color: 'white' },
+                            headerTitleAlign: 'center',
+                            headerTintColor: 'white'
+                        }}
+                        />
+
 
                         <Drawer.Screen name="Gestione Account" component={GestisciAccount} options={{
                             headerStyle: { backgroundColor: '#72bb53' },
