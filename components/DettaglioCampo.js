@@ -40,6 +40,14 @@ class Dettaglio extends React.Component {
         return this.state.token;
     }
 
+    async trovaImmagine () {
+        apiCall(await this.getToken(),'/api/v2/campo/'+id+'/foto' ,"GET", null, null, res => {
+           console.log(res)
+        }, err => { }, this.navigation);
+    }
+
+    
+
     infoCampoDaID = async (id) => {
         apiCall(await this.getToken(), "campo/" + id, "GET", null, null,
             responseJson => {

@@ -31,6 +31,7 @@ class ListaPrenotazioni extends React.Component {
         return this.state.token;
     }
 
+    
     async getPrenotazioni() {
         apiCall(await this.getToken(), 'utente/mie-prenotazioni', 'GET', null, null, (res => {
             if (res.success) {

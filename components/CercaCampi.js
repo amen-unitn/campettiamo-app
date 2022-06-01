@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { Text } from 'react-native';
-import Dettaglio from './Dettaglio';
+import Dettaglio from './DettaglioCampo';
 import ListaCampi from './ListaCampi';
 
 const Stack = createNativeStackNavigator();
