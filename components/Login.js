@@ -29,6 +29,7 @@ class Login extends React.Component {
         await AsyncStorage.setItem('TOKEN', response.token);
         await AsyncStorage.setItem('TIPOLOGIA', response.tipologia);
         await AsyncStorage.setItem('EMAIL', this.state.email);
+        await AsyncStorage.setItem('PAYPAL', response.vaultId);
         this.navigation.navigate('App', {tipologia: response.tipologia, email: this.state.email});
       } else {
         Alert.alert("Errore", "Username o password non validi");

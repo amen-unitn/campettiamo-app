@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Campettiamo",
-    "slug": "Campettiamo",
+    "name": "campettiamo",
+    "slug": "campettiamo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
@@ -22,7 +22,7 @@
       "config": {
         "googleMapsApiKey": "AIzaSyALEwICDNHqJerB0c9jEJaYrp273vtt1j0"
       },
-      "bundleIdentifier": "com.mattia2700.Campettiamo"
+      "bundleIdentifier": "com.mattia2700.campettiamo"
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +35,7 @@
         }
       },
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.mattia2700.Campettiamo"
+      "package": "com.mattia2700.campettiamo"
     },
     "web": {
       "favicon": "./assets/favicon.png"

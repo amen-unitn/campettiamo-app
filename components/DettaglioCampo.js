@@ -58,7 +58,6 @@ class Dettaglio extends React.Component {
     componentDidMount() {
         this.disableAllSlots(this.state.year, this.state.month);
         this.infoCampoDaID(this.state.id)
-        this.disableAllSlots(this.state.year, this.state.month);
         this.setState({ year: new Date().getFullYear() })
         this.setState({ month: new Date().getMonth() + 1 })
         this.setState({ days: this.slots(this.state.year, this.state.month) })
@@ -98,7 +97,7 @@ class Dettaglio extends React.Component {
                             arrowColor: '#72bb53',
                         }}
                         onDayPress={(data) => {
-                            this.navigation.navigate('Slots')
+                            this.navigation.navigate('Slots', {campo: this.state.info })
                         }}
                     />
                 </SafeAreaView>
