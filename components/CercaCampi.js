@@ -4,6 +4,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { Text } from 'react-native';
 import Dettaglio from './DettaglioCampo';
 import ListaCampi from './ListaCampi';
+import Prenota from './Prenota';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -21,9 +22,7 @@ const ShowCampi = () => {
 
 const SlotsDisponibili = ({ route, navigation }) => {
     return (
-        <>
-            <Text>Slots disponibili</Text>
-        </>
+        <Prenota campo={route.params.campo} data={route.params.data} navigation={navigation} />
     )
 }
 

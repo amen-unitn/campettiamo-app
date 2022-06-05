@@ -72,7 +72,7 @@ class MieiCampi extends React.Component {
             }
         }), (err => {
             Alert.alert('Errore', 'Impossibile caricare i campi');
-        }), null)
+        }), this.navigation)
     }
 
     render() {
@@ -171,7 +171,7 @@ class CreaNuovoCampo extends React.Component {
                         }
                     }, (err) => {
                         Alert.alert('Attenzione', err.message);
-                    }, null);
+                    }, this.navigation);
                 }
             }
         }

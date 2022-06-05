@@ -31,12 +31,12 @@ class ListaPrenotazioni extends React.Component {
         return this.state.token;
     }
 
-    
+
     async getPrenotazioni() {
         apiCall(await this.getToken(), 'utente/mie-prenotazioni', 'GET', null, null, (res => {
             if (res.success) {
                 this.setState({
-                    
+
                     mie_prenotazioni: res.data
                 })
             } else {
@@ -57,12 +57,13 @@ class ListaPrenotazioni extends React.Component {
                         data={this.state.mie_prenotazioni}
                         renderItem={({ item }) =>
                             <SafeAreaView style={styles.item}>
-                                    <Text style={styles.titolo}>{item.nome}</Text>
-                                    <Text style={styles.giorno}>{item.data}</Text>
-                                    <Text style={styles.ora}> Dalle : {item.oraInizio.slice(0, -4)} Alle : {item.oraFine.slice(0, -4)}</Text>
-                                    <Text style={styles.ora}>{item.indirizzo}, {item.citta}</Text>
+                                <Text style={styles.titolo}>{item.nome}</Text>
+                                <Text style={styles.giorno}>{item.data}</Text>
+                                <Text style={styles.ora}> Dalle: {item.oraInizio.slice(0, -4)} Alle: {item.oraFine.slice(0, -4)}</Text>
+                                <Text style={styles.ora}>{item.indirizzo}, {item.citta}</Text>
                             </SafeAreaView>
                         }
+                        keyExtractor={item => item.id + item.data + item.oraInizio + item.oraFine}
                     />
                 </SafeAreaView>
             </>

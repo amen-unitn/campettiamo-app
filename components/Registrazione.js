@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { styles } from '../styles/registrazione.js';
-import {registerRequest} from './utils.js';
+import { registerRequest } from './utils.js';
 import { Text, Image, TextInput, Button, Alert, SafeAreaView } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 
 class Registrazione extends React.Component {
-    
+
     constructor(props) {
         super(props);
         this.navigation = props.navigation;
@@ -21,27 +21,27 @@ class Registrazione extends React.Component {
     }
 
     async registrazione() {
-        if(this.state.email == "" || this.state.pwd == "" || this.state.nome == "" ||
+        if (this.state.email == "" || this.state.pwd == "" || this.state.nome == "" ||
             this.state.cognome == "" || this.state.paypal == "" || this.state.telefono == "" ||
-            this.state.tipologia == ""){
-                Alert.alert("Errore", "Tutti i campi sono obbligatori. Completali.")
-            }else{
-                let emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-                if(emailReg.test(this.state.email) === false || emailReg.test(this.state.paypal) === false){
-                    Alert.alert("Errore", "Le email devono essere valide")
-                }else{
-                    //proceed to registration
-                    registerRequest(this.state.nome, this.state.cognome, this.state.email, this.state.pwd, 
-                        this.state.paypal, this.state.telefono, this.state.tipologia, (res) => {
-                            if(res.success == true){
-                                Alert.alert("Registrazione completata", "Ora puoi accedere");
-                                this.navigation.goBack();
-                            }else{
-                                Alert.alert("Errore", "Errore durante la registrazione, riprova!");
-                            }
-                        }, null)
-                }
+            this.state.tipologia == "") {
+            Alert.alert("Errore", "Tutti i campi sono obbligatori. Completali.")
+        } else {
+            let emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+            if (emailReg.test(this.state.email) === false || emailReg.test(this.state.paypal) === false) {
+                Alert.alert("Errore", "Le email devono essere valide")
+            } else {
+                //proceed to registration
+                registerRequest(this.state.nome, this.state.cognome, this.state.email, this.state.pwd,
+                    this.state.paypal, this.state.telefono, this.state.tipologia, (res) => {
+                        if (res.success == true) {
+                            Alert.alert("Registrazione completata", "Ora puoi accedere");
+                            this.navigation.goBack();
+                        } else {
+                            Alert.alert("Errore", "Errore durante la registrazione, riprova!");
+                        }
+                    }, null)
             }
+        }
 
     }
 
@@ -60,7 +60,7 @@ class Registrazione extends React.Component {
                             <SelectDropdown dropdownStyle={styles.dropdown} buttonStyle={styles.dropbtn}
                                 data={["Utente", "Gestore"]}
                                 onSelect={(selectedItem, index) => {
-                                    this.setState({tipologia:selectedItem})
+                                    this.setState({ tipologia: selectedItem })
                                 }}
                                 buttonTextAfterSelection={(selectedItem, index) => {
                                     return selectedItem
@@ -70,7 +70,7 @@ class Registrazione extends React.Component {
                                 }}
                             />
                         </SafeAreaView>
-                        
+
                         <SafeAreaView style={styles.testo}>
                             <Text style={styles.proprieta}>Nome</Text>
                         </SafeAreaView>
@@ -126,7 +126,7 @@ class Registrazione extends React.Component {
                                 onChangeText={(telefono) => this.setState({ telefono })}
                             />
                         </SafeAreaView>
-                        
+
                     </SafeAreaView>
                     <SafeAreaView style={styles.btnCont}>
                         <Button color='#72bb53' title='Registrati' onPress={() => this.registrazione()} />

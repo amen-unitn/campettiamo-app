@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { styles } from '../styles/registrazione.js';
-import {apiCall} from './utils.js';
+import { apiCall } from './utils.js';
 import { Text, Image, TextInput, Button, Alert, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class GestisciAccount extends React.Component {
-    
+
     constructor(props) {
         super(props);
         this.navigation = props.navigation;
@@ -25,9 +25,9 @@ class GestisciAccount extends React.Component {
         return this.state.token;
     }
 
-    async getActualData(){
+    async getActualData() {
         apiCall(await this.getToken(), "utente", "GET", null, null, res => {
-            if(res.data)
+            if (res.data)
                 this.setState({
                     nome: res.data.nome,
                     cognome: res.data.cognome,
@@ -44,40 +44,40 @@ class GestisciAccount extends React.Component {
     }
 
     async modifica() {
-        if(this.state.email == "" || this.state.pwd == "" || this.state.nome == "" ||
+        if (this.state.email == "" || this.state.pwd == "" || this.state.nome == "" ||
             this.state.cognome == "" || this.state.paypal == "" || this.state.telefono == "" ||
-            this.state.tipologia == ""){
+            this.state.tipologia == "") {
             Alert.alert("Errore", "Tutti i campi sono obbligatori. Completali.")
-        }else{
+        } else {
             let emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-            if(emailReg.test(this.state.email) === false || emailReg.test(this.state.paypal) === false){
+            if (emailReg.test(this.state.email) === false || emailReg.test(this.state.paypal) === false) {
                 Alert.alert("Errore", "Le email devono essere valide")
-            }else{
+            } else {
                 apiCall(await this.getToken(), "utente", "PUT", null, {
-                    nome:this.state.nome, cognome:this.state.cognome, email:this.state.email,
-                    password:this.state.pwd, telefono:this.state.telefono, paypal:this.state.paypal
+                    nome: this.state.nome, cognome: this.state.cognome, email: this.state.email,
+                    password: this.state.pwd, telefono: this.state.telefono, paypal: this.state.paypal
                 }, (res) => {
-                    if(res.success == true){
+                    if (res.success == true) {
                         Alert.alert("Modifica completata", "Profilo aggiornato con successo");
-                    }else{
+                    } else {
                         Alert.alert("Errore", "Errore durante la modifica, riprova!");
                     }
-                }, (err) => {}, this.navigation);
+                }, (err) => { }, this.navigation);
             }
         }
     }
 
-    async elimina(){
+    async elimina() {
         apiCall(await this.getToken(), "utente", "DELETE", null, null, async (res) => {
-            if(res.success == true){
+            if (res.success == true) {
                 Alert.alert("Operazione completata", "Profilo cancellato con successo. Torna a trovarci :(");
                 await AsyncStorage.setItem('TOKEN', '');
                 await AsyncStorage.setItem('TIPOLOGIA', '');
                 this.navigation.navigate('Login');
-            }else{
+            } else {
                 Alert.alert("Errore", "Errore durante la cancellazione, riprova!");
             }
-        }, (err) => {}, this.navigation);
+        }, (err) => { }, this.navigation);
     }
 
 
@@ -148,7 +148,7 @@ class GestisciAccount extends React.Component {
                                 onChangeText={(telefono) => this.setState({ telefono })}
                             />
                         </SafeAreaView>
-                        
+
                     </SafeAreaView>
                     <SafeAreaView style={styles.btnCont}>
                         <Button color='#72bb53' title='Aggiorna' onPress={() => this.modifica()} />

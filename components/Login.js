@@ -29,7 +29,7 @@ class Login extends React.Component {
         await AsyncStorage.setItem('TOKEN', response.token);
         await AsyncStorage.setItem('TIPOLOGIA', response.tipologia);
         await AsyncStorage.setItem('EMAIL', this.state.email);
-        this.navigation.navigate('App', {tipologia: response.tipologia, email: this.state.email});
+        this.navigation.navigate('App', { tipologia: response.tipologia, email: this.state.email });
       } else {
         Alert.alert("Errore", "Username o password non validi");
       }
@@ -39,11 +39,11 @@ class Login extends React.Component {
 
   async componentDidMount() {
     let token = await AsyncStorage.getItem('TOKEN');
-    if (token && token != ""){
+    if (token && token != "") {
       let tipologia = await AsyncStorage.getItem('TIPOLOGIA');
-      this.navigation.navigate('App', {tipologia: tipologia});
+      this.navigation.navigate('App', { tipologia: tipologia });
     }
-      
+
   }
 
   render() {
@@ -53,7 +53,7 @@ class Login extends React.Component {
         <Image style={styles.image} source={require("../assets/logo.png")} />
         <Text style={styles.titolo}>Login</Text>
 
-        
+
         <View style={styles.inputView}>
           <TextInput
             style={styles.TextInput}

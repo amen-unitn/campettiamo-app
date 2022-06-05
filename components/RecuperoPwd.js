@@ -18,19 +18,19 @@ class RecuperoPwd extends React.Component {
   }
 
   async requestPassword() {
-    apiCall("", "recupero", "POST", null, {"email":this.state.email}, (res)=>{
-        if(res.success){
-            Alert.alert("Password generata", "Controlla la tua mail, ti abbiamo inviato una nuova password");
-            this.navigation.goBack();
-        }else{
-            Alert.alert("Errore", "Utente non trovato");
-        }
-    }, (err)=>{
-        Alert.alert("Errore", "Riprova più tardi");
+    apiCall("", "recupero", "POST", null, { "email": this.state.email }, (res) => {
+      if (res.success) {
+        Alert.alert("Password generata", "Controlla la tua mail, ti abbiamo inviato una nuova password");
+        this.navigation.goBack();
+      } else {
+        Alert.alert("Errore", "Utente non trovato");
+      }
+    }, (err) => {
+      Alert.alert("Errore", "Riprova più tardi");
     }, null);
 
   }
-      
+
 
   render() {
 

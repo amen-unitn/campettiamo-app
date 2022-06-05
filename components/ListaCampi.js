@@ -33,8 +33,8 @@ class ListaCampi extends React.Component {
         this.listCampiByLuogo();
     }
 
-    async getToken(){
-        if(!this.state.token)
+    async getToken() {
+        if (!this.state.token)
             this.state.token = await AsyncStorage.getItem('TOKEN');
         return this.state.token;
     }
@@ -48,7 +48,7 @@ class ListaCampi extends React.Component {
 
     componentWillUnmount() {
         // fix Warning: Can't perform a React state update on an unmounted component
-        this.setState = (state,callback)=>{
+        this.setState = (state, callback) => {
             return;
         };
     }
@@ -125,17 +125,17 @@ class ListaCampi extends React.Component {
 
     listCampiByNome = async () => {
 
-        apiCall(await this.getToken(), "campi-nome", "GET", [{name:"nome", value:this.state.searchNome}], null,
+        apiCall(await this.getToken(), "campi-nome", "GET", [{ name: "nome", value: this.state.searchNome }], null,
             responseJson => {
                 //console.log(responseJson);
-                if(responseJson.success){
+                if (responseJson.success) {
                     this.setState({
                         campiNome: responseJson.data,
                     })
-                }else{
+                } else {
                     Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
                 }
-                
+
             },
             () => {
                 Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
@@ -144,14 +144,14 @@ class ListaCampi extends React.Component {
 
     listCampiByLuogo = async () => {
         if (this.state.searchLuogo != '') {
-            apiCall(await this.getToken(), "campi-luogo", "GET", [{name:"luogo", value:this.state.searchLuogo},
-                {name:"raggio", value:this.state.raggio}], null,
+            apiCall(await this.getToken(), "campi-luogo", "GET", [{ name: "luogo", value: this.state.searchLuogo },
+            { name: "raggio", value: this.state.raggio }], null,
                 responseJson => {
-                    if(responseJson.success){
+                    if (responseJson.success) {
                         this.setState({
                             campiLuogo: responseJson.data,
                         })
-                    }else{
+                    } else {
                         Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
                     }
                 },
@@ -159,14 +159,14 @@ class ListaCampi extends React.Component {
                     Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
                 }, this.navigation);
         } else {
-            apiCall(await this.getToken(), "campi-raggio", "GET", [{name:"lat", value:this.state.latitude}, 
-                {name:"lng", value:this.state.longitude}, {name:"raggio", value:this.state.raggio}], null,
+            apiCall(await this.getToken(), "campi-raggio", "GET", [{ name: "lat", value: this.state.latitude },
+            { name: "lng", value: this.state.longitude }, { name: "raggio", value: this.state.raggio }], null,
                 responseJson => {
-                    if(responseJson.success){
+                    if (responseJson.success) {
                         this.setState({
                             campiLuogo: responseJson.data,
                         })
-                    }else{
+                    } else {
                         Alert.alert("Impossibile caricare i campi", "Riprova più tardi");
                     }
                 },
@@ -194,7 +194,7 @@ class ListaCampi extends React.Component {
                         renderItem={({ item }) =>
                             <TouchableOpacity
                                 onPress={() => {
-                                    this.navigation.navigate('Dettaglio campo', { campo: item.id })
+                                    this.navigation.navigate('Dettaglio campo', { campo: item })
                                 }}
                                 activeOpacity={0.8}
                             >
