@@ -87,6 +87,7 @@ class Dettaglio extends React.Component {
                             this.navigation.navigate('Slots', {
                                 data: data.dateString,
                                 campo: this.state.campo.id,
+                                tariffa: this.state.campo.tariffa,
                             })
                         }}
                     />

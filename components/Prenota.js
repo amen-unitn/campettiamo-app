@@ -1,143 +1,184 @@
-import * as React from 'react';
-import { Alert, Button, Text, TextInput, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
-import { apiCall } from './utils';
+import React, { useEffect, useState } from 'react';
+import {
+    SafeAreaView,
+    FlatList,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    Alert,
+} from 'react-native';
+import { requestOneTimePayment } from 'react-native-paypal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiCall } from './utils';
 import styles from '../styles/prenota';
 
-class Prenota extends React.Component {
-    constructor(props) {
-        super(props);
-        this.navigation = props.navigation;
-        this.state = {
-            id: props.campo,
-            data: props.data,
-            slot_liberi: null,
-            token: null,
-            buttonText: 'ACCEDI A PAYPAL',
-            oraInizio: null,
-            oraFine: null,
-        }
-    }
+const Prenota = (props) => {    
 
-    async getToken() {
-        if (!this.state.token)
-            this.state.token = await AsyncStorage.getItem('TOKEN');
-        return this.state.token;
-    }
+    const [times_pressed, setTimesPressed] = useState(0);
+    const [oraInizio, setOraInizio] = useState('');
+    const [oraFine, setOraFine] = useState('');
+    const [slotLiberi, setSlotLiberi] = useState([]);
+    const [buttonText, setButtonText] = useState('ACCEDI A PAYPAL');
 
-    async get_slots() {
-        apiCall(await this.getToken(), 'campo/' + this.state.id + '/slot/giorno/' + this.state.data, 'GET', null, null, (res => {
+    const [clientId, setClientId] = useState('');
+    const [serverToken, setServerToken] = useState('');
+    const [disabled, setDisabled] = useState(false);
+
+    const [success, setSuccess] = useState({
+        nonce: '',
+        payerId: '',
+        email: '',
+        firstName: '',
+        lastName: '',
+        phone: '',
+    });
+
+    const get_slots = async () => {
+        apiCall(serverToken, 'campo/' + props.campo + '/slot/giorno/' + props.data, 'GET', null, null, (res => {
             if (res.success) {
-                this.setState({
-                    slot_liberi: res.data
-                })
-            }
-            else {
-                this.setState({
-                    slot_liberi: []
-                })
+                setSlotLiberi(res.data)
+            } else {
+                setSlotLiberi([])
             }
         }), (err => {
             Alert.alert('Errore', 'Impossibile caricare gli slot');
-        }), this.navigation)
+        }), props.navigation)
     }
 
-    componentDidMount() {
-        this.get_slots();
+    useEffect(() => {
+        get_slots();
+    }, [serverToken])
+
+    const prenota = async () => {
+        if (times_pressed === 0) {
+            requestPayment();
+            setButtonText('PAGA E CONFERMA')
+            setTimesPressed(1)
+        } else {
+            checkIfCanBook();
+            setDisabled(true)
+        }
     }
 
-    componentWillUnmount() {
-        // fix Warning: Can't perform a React state update on an unmounted component
-        this.setState = (state, callback) => {
-            return;
-        };
+    const checkIfCanBook = () => {
+        apiCall(serverToken, 'campo/' + props.campo + '/prenota', 'POST', null, {
+            data: props.data,
+            oraInizio: oraInizio,
+            oraFine: oraFine,
+        }, (res => {
+            if (res.success) {
+                submitPayment();
+            } else {
+                Alert.alert('Errore', 'Impossibile prenotare questo slot');
+            }
+        }), (err => {
+            Alert.alert('Errore', 'Impossibile prenotare');
+        }), props.navigation)
     }
 
-    test() {
-        Alert.alert('Access effettuato con successo');
-        this.setState({
-            buttonText: 'PAGA E CONFERMA'
-        })
-    }
-
-    handleInizioHourInput = (text) => {
+    const handleInizioHourInput = (text) => {
         if (text.length === 2) {
-            text = text + ':';
-            this.setState({
-                oraInizio: text
-            })
+            setOraInizio(text + ':');
         } else
             // keep only first 5 characters
-            this.setState({ oraInizio: text.substring(0, 5) });
+            setOraInizio(text.substring(0, 5));
     }
 
-    handleFineHourInput = (text) => {
+    const handleFineHourInput = (text) => {
         if (text.length === 2) {
-            text = text + ':';
-            this.setState({
-                oraFine: text
-            })
+            setOraFine(text + ':');
         } else
             // keep only first 5 characters
-            this.setState({ oraFine: text.substring(0, 5) });
+            setOraFine(text.substring(0, 5));
     }
 
+    const fetchToken = async () => {
+        await AsyncStorage.getItem('PAYPAL').then(
+            (clientId) => setClientId(clientId),
+        )
+        await AsyncStorage.getItem('TOKEN').then(
+            (token) => setServerToken(token)
+        )
+    }
 
-    render() {
-        return (
-            <>
-                <SafeAreaView style={styles.container}>
-                    <FlatList
-                        style={{
-                            maxHeight: '50%',
-                        }}
-                        data={this.state.slot_liberi}
-                        renderItem={({ item }) => {
-                            return (
-                                <SafeAreaView style={styles.item}>
-                                    <Text style={styles.ora}>{item.oraInizio.slice(0, -4)} - {item.oraFine.slice(0, -4)}</Text>
-                                </SafeAreaView>
-                            )
-                        }}
-                        keyExtractor={item => item.oraInizio}
-                    />
+    fetchToken();
+
+    const errorAlert = (err) => {
+        if (err) Alert.alert('Oops! Qualcosa è andato storto riprova', err);
+    };
+
+    const requestPayment = () => {
+        apiCall(serverToken, "paypal/client", "GET", [{ name: "id", value: clientId }], null, (response) => {
+            requestOneTimePayment(response.token, { amount: props.amount.toString() })
+                .then(setSuccess)
+        }, (err) => {
+            errorAlert(err);
+        }, null)
+    }
+
+    const submitPayment = async () => {
+        if (success.nonce) {
+            await apiCall(serverToken, "paypal/paga", "POST", null, { nonce: success.nonce, amount: props.amount.toString() }, (success, message) => {
+                Alert.alert("Prenotazione effettuata", "Pagamento andato a buon fine")
+                setDisabled(true)
+            }, (err) => {
+                errorAlert(err.message)
+            }, null)
+        }
+    }
+
+    return (
+        <>
+            <SafeAreaView style={styles.container}>
+                <FlatList
+                    style={{
+                        maxHeight: '50%',
+                    }}
+                    data={slotLiberi}
+                    renderItem={({ item }) => {
+                        return (
+                            <SafeAreaView style={styles.item}>
+                                <Text style={styles.ora}>{item.oraInizio.slice(0, -4)} - {item.oraFine.slice(0, -4)}</Text>
+                            </SafeAreaView>
+                        )
+                    }}
+                    keyExtractor={item => item.oraInizio}
+                />
+                <SafeAreaView style={{
+                    minWidth: '90%',
+                    maxWidth: '90%',
+                    marginBottom: '2%',
+                    marginTop: '20%',
+                }}>
+                    <Text style={{
+                        fontStyle: 'italic',
+                        textAlign: 'center',
+                    }}>Inserire l'intervallo di tempo per il quale vuoi prenotare il campo</Text>
+                </SafeAreaView>
+                <SafeAreaView style={styles.slots}>
+                    <TextInput style={styles.input} placeholder='Ora inizio' onChangeText={handleInizioHourInput} value={oraInizio} />
+                    <TextInput style={styles.input} placeholder='Ora fine' onChangeText={handleFineHourInput} value={oraFine} />
+                </SafeAreaView>
+                <SafeAreaView style={styles.bottom}>
                     <SafeAreaView style={{
                         minWidth: '90%',
                         maxWidth: '90%',
                         marginBottom: '2%',
-                        marginTop: '20%',
                     }}>
                         <Text style={{
                             fontStyle: 'italic',
                             textAlign: 'center',
-                        }}>Inserire l'intervallo di tempo per il quale vuoi prenotare il campo</Text>
+                        }}>Per confermare la tua prenotazione devi prima accedere al tuo account PayPal e poi pagare</Text>
                     </SafeAreaView>
-                    <SafeAreaView style={styles.slots}>
-                        <TextInput style={styles.input} placeholder='Ora inizio' onChangeText={this.handleInizioHourInput} value={this.state.oraInizio} />
-                        <TextInput style={styles.input} placeholder='Ora fine' onChangeText={this.handleFineHourInput} value={this.state.oraFine} />
+                    <SafeAreaView>
+                        <TouchableOpacity onPress={prenota} disabled={disabled} style={styles.button}>
+                            <Text style={styles.buttonText}>{buttonText}</Text>
+                        </TouchableOpacity>
                     </SafeAreaView>
-                    <SafeAreaView style={styles.bottom}>
-                        <SafeAreaView style={{
-                            minWidth: '90%',
-                            maxWidth: '90%',
-                            marginBottom: '2%',
-                        }}>
-                            <Text style={{
-                                fontStyle: 'italic',
-                                textAlign: 'center',
-                            }}>Per confermare la tua prenotazione devi prima accedere al tuo account PayPal e poi pagare</Text>
-                        </SafeAreaView>
-                        <SafeAreaView>
-                            <TouchableOpacity onPress={() => this.prova()}
-                                style={styles.button}>
-                                <Text style={styles.buttonText}>{this.state.buttonText}</Text>
-                            </TouchableOpacity>
-                        </SafeAreaView>
-                    </SafeAreaView >
-                </SafeAreaView>
-            </>
-        );
-    }
-}
+                </SafeAreaView >
+            </SafeAreaView>
+        </>
+    );
+};
 
 module.exports = Prenota;

@@ -22,7 +22,7 @@ const ShowCampi = () => {
 
 const SlotsDisponibili = ({ route, navigation }) => {
     return (
-        <Prenota campo={route.params.campo} data={route.params.data} navigation={navigation} />
+        <Prenota campo={route.params.campo} data={route.params.data} navigation={navigation} amount={route.params.tariffa} />
     )
 }
 

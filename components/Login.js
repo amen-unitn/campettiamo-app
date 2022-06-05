@@ -28,6 +28,7 @@ class Login extends React.Component {
       if (response.success == true) {
         await AsyncStorage.setItem('TOKEN', response.token);
         await AsyncStorage.setItem('TIPOLOGIA', response.tipologia);
+        await AsyncStorage.setItem('PAYPAL', response.vaultId);
         await AsyncStorage.setItem('EMAIL', this.state.email);
         this.navigation.navigate('App', { tipologia: response.tipologia, email: this.state.email });
       } else {

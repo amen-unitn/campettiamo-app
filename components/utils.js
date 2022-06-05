@@ -1,5 +1,5 @@
 const BASE_URL = "https://campettiamo.herokuapp.com/api/v2/"
-//const BASE_URL = "http://192.168.1.111:9080/api/v2/";
+// const BASE_URL = "http://192.168.1.120:9080/api/v2/";
 
 import { Alert } from 'react-native';
 
@@ -21,7 +21,7 @@ function apiCallPromise(token, path, method, getParams, body) {
         })
         queryString = queryString.slice(0, -1); //remove last &
     }
-    //console.log(BASE_URL + path + queryString); 
+    // console.log(BASE_URL + path + queryString); 
 
     return new Promise((resolve, reject) => {
         fetch(BASE_URL + path + queryString, {

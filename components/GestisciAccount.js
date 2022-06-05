@@ -73,6 +73,7 @@ class GestisciAccount extends React.Component {
                 Alert.alert("Operazione completata", "Profilo cancellato con successo. Torna a trovarci :(");
                 await AsyncStorage.setItem('TOKEN', '');
                 await AsyncStorage.setItem('TIPOLOGIA', '');
+                await AsyncStorage.setItem('PAYPAL', '');
                 this.navigation.navigate('Login');
             } else {
                 Alert.alert("Errore", "Errore durante la cancellazione, riprova!");
