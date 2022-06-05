@@ -13,6 +13,7 @@ class Logout extends React.Component {
     await AsyncStorage.setItem('TOKEN', "");
     await AsyncStorage.setItem('TIPOLOGIA', "")
     await AsyncStorage.setItem('EMAIL', "")
+    await AsyncStorage.setItem('PAYPAL', '');
   }
 
   render() {

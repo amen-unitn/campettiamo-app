@@ -1,5 +1,5 @@
 const BASE_URL = "https://campettiamo.herokuapp.com/api/v2/"
-//const BASE_URL = "http://192.168.1.111:9080/api/v2/";
+// const BASE_URL = "http://192.168.1.120:9080/api/v2/";
 
 import { Alert } from 'react-native';
 
@@ -12,16 +12,16 @@ import { Alert } from 'react-native';
  * @param {object} body params to send in request body (object)
  * @returns Promise passing object (parsed from json) to resolve() and string to reject()
  */
-function apiCallPromise(token, path, method, getParams, body){
+function apiCallPromise(token, path, method, getParams, body) {
     let queryString = "";
-    if(getParams != null){
+    if (getParams != null) {
         queryString = "?";
         getParams.forEach(param => {
             queryString += param['name'] + "=" + param['value'] + "&"
-        }) 
+        })
         queryString = queryString.slice(0, -1); //remove last &
-    } 
-    //console.log(BASE_URL + path + queryString); 
+    }
+    // console.log(BASE_URL + path + queryString); 
 
     return new Promise((resolve, reject) => {
         fetch(BASE_URL + path + queryString, {
@@ -51,19 +51,19 @@ function apiCallPromise(token, path, method, getParams, body){
  * @param {function} reject function to call in case of errors
  * @returns void
  */
-function apiCall(token, path, method, getParams, body, resolve, reject, navigation){
-    apiCallPromise(token, path, method, getParams, body).then((res)=>{
+function apiCall(token, path, method, getParams, body, resolve, reject, navigation) {
+    apiCallPromise(token, path, method, getParams, body).then((res) => {
         //console.log(res);
-        if(res.success == false && res.errno == 1){
+        if (res.success == false && res.errno == 1) {
             //token is invalid
             //here i need to redirect to login page
             Alert.alert("Sessione scaduta", "Rifai l'accesso");
-            if(navigation)
+            if (navigation)
                 navigation.navigate('Login')
-        }else
+        } else
             resolve(res);
-    }).catch((error)=>{
-        if(reject)
+    }).catch((error) => {
+        if (reject)
             reject(error);
     });
 }
@@ -76,20 +76,20 @@ function apiCall(token, path, method, getParams, body, resolve, reject, navigati
  * @param {function} reject function to call in case of errors
  * @returns void
  */
-function loginRequest(email, pwd, resolve, reject){
-    apiCall("", "login", "POST", null, {email:email, password:pwd}, resolve, reject);
+function loginRequest(email, pwd, resolve, reject) {
+    apiCall("", "login", "POST", null, { email: email, password: pwd }, resolve, reject);
 }
 
 
-function registerRequest(nome, cognome, email, pwd, paypal, telefono, tipologia, resolve, reject){
+function registerRequest(nome, cognome, email, pwd, paypal, telefono, tipologia, resolve, reject) {
     let path = "";
-    switch(tipologia){
-        case "Utente":{path = "utente"; break;}
-        case "Gestore":{path = "gestore";break;}
+    switch (tipologia) {
+        case "Utente": { path = "utente"; break; }
+        case "Gestore": { path = "gestore"; break; }
     }
     apiCall("", path, "POST", null, {
-        nome:nome, cognome:cognome, email:email, paypal:paypal, telefono:telefono, password:pwd
+        nome: nome, cognome: cognome, email: email, paypal: paypal, telefono: telefono, password: pwd
     }, resolve, reject);
 }
 
-module.exports = {apiCall, loginRequest, registerRequest}
+module.exports = { apiCall, loginRequest, registerRequest }

@@ -97,7 +97,7 @@ class PrenotazioniCampo extends React.Component {
         this.navigation = props.navigation;
         this.state = {
             id: props.campo,
-            lista_prenotazioni_campo : []
+            lista_prenotazioni_campo: []
         }
         this.getPrenotazioni(this.state.id)
     }
@@ -114,37 +114,38 @@ class PrenotazioniCampo extends React.Component {
     }
 
     async getPrenotazioni(idCampo) {
-        apiCall(await this.getToken(), 'campo/'+idCampo+'/prenotazioni', 'GET', null, null, (res => {
-             if (res.success) {
-                 console.log(res)
-                 this.setState({
-                     lista_prenotazioni_campo: res.data 
-                 })
-             } else {
-                 this.setState({
-                     lista_prenotazioni_campo: []
-                 })
-             }
-         }), (err => {
-             Alert.alert('Errore', 'Impossibile caricare le prenotazioni');
-         }), null)
-     }
+        apiCall(await this.getToken(), 'campo/' + idCampo + '/prenotazioni', 'GET', null, null, (res => {
+            if (res.success) {
+                console.log(res)
+                this.setState({
+                    lista_prenotazioni_campo: res.data
+                })
+            } else {
+                this.setState({
+                    lista_prenotazioni_campo: []
+                })
+            }
+        }), (err => {
+            Alert.alert('Errore', 'Impossibile caricare le prenotazioni');
+        }), null)
+    }
 
     render() {
         return (
             <SafeAreaView style={styles.container}>
-            <FlatList
-                data={this.state.lista_prenotazioni_campo}
-                renderItem={({ item }) =>
-                    <SafeAreaView style={styles.item}>
+                <FlatList
+                    data={this.state.lista_prenotazioni_campo}
+                    renderItem={({ item }) =>
+                        <SafeAreaView style={styles.item}>
                             <Text style={styles.giorno}>IdUtente : {item.idUtente}</Text>
                             <Text style={styles.giorno}>{item.data}</Text>
-                            <Text style={styles.ora}> Dalle : {item.oraInizio.slice(0, -4)} Alle : {item.oraFine.slice(0, -4)}</Text>
-                    
-                    </SafeAreaView>
-                }
-            />
-        </SafeAreaView>
+                            <Text style={styles.ora}> Dalle: {item.oraInizio.slice(0, -4)} Alle: {item.oraFine.slice(0, -4)}</Text>
+
+                        </SafeAreaView>
+                    }
+                    keyExtractor={item => item.id + item.data + item.oraInizio + item.oraFine}
+                />
+            </SafeAreaView>
         );
     }
 
@@ -167,7 +168,7 @@ const ShowPrenotazioniMieiCampi = () => {
         <Stack.Navigator initialRouteName='Prenotazioni per campo' screenOptions={{ headerShown: false }}>
             <Stack.Screen name='Miei Campi Prenotazioni' component={RouterCampiPrenotazioni} />
             <Stack.Screen name='Prenotazioni del Campo' component={RouterPrenotazioniCampo} />
-            
+
         </Stack.Navigator>
     )
 }
