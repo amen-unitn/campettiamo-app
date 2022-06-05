@@ -1,19 +1,40 @@
 import * as React from 'react';
 import { Alert, Button, Text, TextInput } from 'react-native';
-import { SafeAreaView, FlatList } from 'react-native';
+import { SafeAreaView, FlatList, View} from 'react-native'; 
+import {TimePicker} from 'react-native-simple-time-picker';
 import { apiCall } from './utils';
 import styles from '../styles/miei_campi';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Calendar } from 'react-native-calendars';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
+
+
+
+
 const Stack = createNativeStackNavigator();
+
+const ModificaSlot = ({ route, navigation }) => {
+    return (
+        <Modifica_Slot campo={route.params.campo} navigation={navigation} />
+    )
+}
+
+const NewSlot = ({ route, navigation }) => {
+    return (
+        <New_Slot campo={route.params.campo} giorno={route.params.giorno} navigation={navigation} />
+    )
+}
 
 const PropCampo = ({ route, navigation }) => {
     return (
         <ModificaCampo campo={route.params.campo} navigation={navigation} />
     )
 }
+
+
 
 const NuovoCampo = ({ route, navigation }) => {
     return (
@@ -85,6 +106,9 @@ class MieiCampi extends React.Component {
                             <TouchableOpacity
                                 onPress={() => {
                                     this.navigation.navigate('Proprietà campo', { campo: item.id })
+                                }}
+                                onLongPress={() => {
+                                    this.navigation.navigate('Gestione Slot Campo', { campo: item.id })
                                 }}
                                 activeOpacity={0.8}
                             >
@@ -471,12 +495,315 @@ class ModificaCampo extends React.Component {
 
 }
 
+class Modifica_Slot extends React.Component {
+    constructor(props) {
+        super(props);
+        this.navigation = props.navigation;
+        this.state = {
+            id: props.campo,
+            info: [],
+            year: new Date().getFullYear(),
+            month: new Date().getMonth() + 1,
+            currentday : ''
+        }
+        
+        this.infoCampoDaID(this.state.id)
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+    
+    }
+
+    componentWillUnmount() {
+        // fix Warning: Can't perform a React state update on an unmounted component
+        this.setState = (state, callback) => {
+            return;
+        };
+    }
+
+    async getToken() {
+        if (!this.state.token)
+            this.state.token = await AsyncStorage.getItem('TOKEN');
+        return this.state.token;
+    }
+
+
+    infoCampoDaID = async (id) => {
+        apiCall(await this.getToken(), "campo/" + id, "GET", null, null,
+            responseJson => {
+                this.setState({ info: responseJson.data })
+            }, null, this.navigation)
+    }
+
+    componentDidMount() {
+        this.infoCampoDaID(this.state.id)
+        this.setState({ year: new Date().getFullYear() })
+        this.setState({ month: new Date().getMonth() + 1 })
+    }
+
+    render() {
+        return (
+            <>
+                <SafeAreaView style={styles.container}> 
+                    <Text style={{
+                        fontWeight: 'bold',
+                        fontSize: 20,
+                        justifyContent: 'flex-start',
+                        textAlign: 'center',
+                    }}>{this.state.info.nome}</Text>
+                </SafeAreaView>
+                <SafeAreaView>
+                <Text style={{
+                        fontWeight: 'bold',
+                        fontSize: 20,
+                        justifyContent: 'flex-start',
+                        textAlign: 'center'
+                    }}>Seleziona il giorno</Text>
+                
+                    <Calendar style={{
+                        marginBottom: '25%',
+                        marginHorizontal: '5%',
+                    }}
+                        onMonthChange={(date) => {
+                            this.setState({ month: date.month })
+                        }}
+                        markedDates={this.state.days || this.state.disable_all_days}
+                        theme={{
+                            todayTextColor: '#72bb53',
+                            arrowColor: '#72bb53',
+                        }}
+                        onDayPress={(data) => {
+                            this.navigation.navigate('Nuovo Slot' , { campo: this.state.id, giorno : data.dateString })
+                           
+                        }}
+                    />
+                </SafeAreaView>
+            </>
+        )
+    }
+}
+
+class New_Slot extends React.Component {
+    constructor(props) {
+        super(props);
+        this.navigation = props.navigation;
+        this.state = {
+            isFetching : false,
+            slots : [],
+            id: props.campo,
+            data : props.giorno,
+            oraInizio : '',
+            oraFine: '',
+            
+        }
+        
+    }
+    
+
+    onRefresh() {
+        this.setState({isFetching: true},() => {this.getSlot();});
+    }
+
+    componentWillUnmount() {
+        // fix Warning: Can't perform a React state update on an unmounted component
+        this.setState = (state, callback) => {
+            return;
+        };
+    }
+
+    async getToken() {
+        if (!this.state.token)
+            this.state.token = await AsyncStorage.getItem('TOKEN');
+        return this.state.token;
+    }
+
+    componentDidMount() {
+        this.getSlot()
+    }
+
+    async getSlot() {
+
+        let url = 'campo/'+this.state.id+'/slot/giorno/'+this.state.data
+       
+        apiCall(await this.getToken(), url , 'GET', null, null, (res => {
+            if (res.success) {
+                
+                this.setState({
+                     slots : res.data
+                })
+            } else {
+                this.setState({
+                    
+                    slots : ["non sono stati trovati slots"]
+                })
+            }
+        }), (err => {
+            Alert.alert('Errore', 'Impossibile caricare gli slot');
+        }), null)
+        this.setState({ isFetching: false })
+    }
+
+    async newSlotApicall () {
+        let url = 'campo/'+this.state.id+'/slot'
+    
+        let oraInizio = ''
+        let oraFine = ''
+        let minuteInizio=''
+        let minuteFine= ''
+
+        if (this.state.oraInizio.hours == undefined || this.state.oraInizio.minutes ==undefined ||this.state.oraFine.hours == undefined || this.state.oraFine.minutes ==undefined  ){
+
+        } else {
+            if (this.state.oraInizio.hours < 10  ){
+                
+                oraInizio = '0'+this.state.oraInizio.hours+':'
+            }else {
+               
+                oraInizio = this.state.oraInizio.hours+':'
+            }
+            if (this.state.oraFine.hours < 10  ){
+                
+                oraFine = '0'+this.state.oraFine.hours+':'
+            }else {
+                
+                oraFine = this.state.oraFine.hours+':'
+            }
+            if (this.state.oraInizio.minutes < 10  ){
+               
+                minuteInizio = '0'+this.state.oraInizio.minutes
+            }else {
+               
+                minuteInizio = this.state.oraInizio.minutes
+            }
+            if (this.state.oraFine.minutes < 10  ){
+               
+                minuteFine = '0'+this.state.oraFine.minutes
+            }else {
+               
+                minuteFine = this.state.oraFine.minutes
+            }
+        }
+        let orarioInizio = oraInizio+minuteInizio
+        let orarioFine = oraFine+minuteFine
+       
+
+        
+        apiCall(await this.getToken(), url , 'POST', null,{ 
+            
+            data: this.state.data,
+            oraInizio: orarioInizio,
+            oraFine: orarioFine
+        }, (res => {
+            if (res.success) {
+                Alert.alert('Ottimo', 'Slot Creato');
+            } else {
+                
+            Alert.alert('Errore', 'Impossibile creare lo slot');
+        }
+    }), (err => {
+            Alert.alert('Errore', 'Impossibile creare lo slot');
+    }), null)
+    }
+
+async deleteSlot(orainizio , orafine){
+        let url = 'campo/'+this.state.id+'/slot'
+      
+
+        apiCall(await this.getToken(), url , 'DELETE', null,{ 
+         
+            data: this.state.data,
+            oraInizio: orainizio,
+            oraFine: orafine
+        }, (res => {
+            if (res.success) {
+                Alert.alert('Ottimo', 'Slot Eliminato');
+            } else {
+                
+                Alert.alert('Errore', 'Impossibile eliminare lo slot');
+            }
+        }), (err => {
+                Alert.alert('Errore', 'Impossibile eliminare lo slot');
+        }), null)
+        this.getSlot();
+    }
+    
+    render() {
+        return (
+            <>
+                <SafeAreaView style={styles.container}>
+                    <Text style={styles.title}>
+                    SLOTS : Tieni premuto per eliminare 
+                    </Text>
+                <FlatList
+                        data={this.state.slots}
+                        renderItem={({ item }) =>
+                            <TouchableOpacity
+                                onLongPress={() => {
+                                        this.deleteSlot(item.oraInizio.slice(0,-4),item.oraFine.slice(0,-4) )
+
+                                }}
+                                activeOpacity={0.8}
+                            >
+                                <SafeAreaView style={styles.item}>
+                                    <Text style={styles.text}>{item.oraInizio.slice(0,-4)}</Text>
+                                    <Text style={styles.text}>{item.oraFine.slice(0,-4)}</Text>
+                                </SafeAreaView>
+                            </TouchableOpacity>
+                        }
+                        keyExtractor={item => item.id}
+                        onRefresh={() => this.onRefresh()}
+                        refreshing={this.state.isFetching}
+                        
+                    />          
+                            
+                </SafeAreaView>
+
+                  
+                <SafeAreaView style={styles.container}>
+                <View style={styles.container}>
+                    <Text style={styles.title}>
+                        Scegli ora inizio
+                    </Text>
+                    <TimePicker
+                    onChange={(hours, minutes) => {
+                        this.state.oraInizio = hours
+                       
+                    }}
+                    />
+                </View>
+                </SafeAreaView>
+                
+                <SafeAreaView style={styles.container}>
+                <View style={styles.container}>
+                    <Text style={styles.title}>
+                        Scegli ora Fine
+                    </Text>
+                    <TimePicker
+                    onChange={(hours, minutes) => {
+                        this.state.oraFine = hours
+                        
+                    }}
+                    />
+                </View>
+                </SafeAreaView>
+                
+                <SafeAreaView style={styles.crea}>
+                            <Button color='#72bb53' title='Crea Slot' onPress={() => this.newSlotApicall()} />
+                </SafeAreaView>
+            </>
+        )
+    }
+}
+
+
 const ShowInfoMieiCampi = () => {
     return (
         <Stack.Navigator initialRouteName='Miei Campi' screenOptions={{ headerShown: false }}>
             <Stack.Screen name='Miei campi' component={ShowMieiCampi} />
             <Stack.Screen name='Proprietà campo' component={PropCampo} />
             <Stack.Screen name='Nuovo campo' component={NuovoCampo} />
+            <Stack.Screen name='Gestione Slot Campo' component={ModificaSlot} />
+            <Stack.Screen name='Nuovo Slot' component={NewSlot} />
         </Stack.Navigator>
     )
 }
