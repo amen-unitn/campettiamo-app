@@ -231,27 +231,6 @@ class ListaCampi extends React.Component {
                             latitudeDelta: this.state.latitude != 0 ? this.state.latitudeDelta : 90,
                             longitudeDelta: this.state.latitudeDelta != 0 ? this.state.longitudeDelta : 180
                         }}
-                        onRegionChangeComplete={(region) => { // check if position is now avaiable
-
-                            if (this.state.moved == false && this.state.currentPosition == true) {
-                                this.setState({
-                                    latitude: region.latitude,
-                                    longitude: region.longitude,
-                                    latitudeDelta: region.latitudeDelta,
-                                    longitudeDelta: region.longitudeDelta,
-                                    moved: true,
-                                    currentPosition: false
-                                })
-                            } else if (this.state.textChanged == false || this.state.moved == false) {
-                                this.setState({
-                                    latitude: region.latitude,
-                                    longitude: region.longitude,
-                                    latitudeDelta: region.latitudeDelta,
-                                    longitudeDelta: region.longitudeDelta,
-                                    moved: true,
-                                })
-                            }
-                        }}
                     >
                         {this.state.campiLuogo.map(campo => (
                             <MapView.Marker
