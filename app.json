@@ -4,7 +4,7 @@
     "slug": "Campettiamo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/app.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -22,11 +22,11 @@
       "config": {
         "googleMapsApiKey": "AIzaSyALEwICDNHqJerB0c9jEJaYrp273vtt1j0"
       },
-      "bundleIdentifier": "com.mattia2700.Campettiamo"
+      "bundleIdentifier": "com.amen.campettiamo"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage": "./assets/app.png",
         "backgroundColor": "#FFFFFF"
       },
       "config": {
@@ -35,7 +35,7 @@
         }
       },
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.mattia2700.Campettiamo"
+      "package": "com.amen.campettiamo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
