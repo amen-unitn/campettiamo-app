@@ -241,7 +241,7 @@ class ListaCampi extends React.Component {
                                     longitude: campo.lng
                                 }}
                                 onCalloutPress={() => {
-                                    this.navigation.navigate('Dettaglio campo', { campo: campo.id })
+                                    this.navigation.navigate('Dettaglio campo', { campo: item })
                                 }}
                             >
                                 <MapView.Callout>
