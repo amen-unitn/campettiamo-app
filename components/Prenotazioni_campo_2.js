@@ -116,7 +116,7 @@ class PrenotazioniCampo extends React.Component {
     async getPrenotazioni(idCampo) {
         apiCall(await this.getToken(), 'campo/' + idCampo + '/prenotazioni', 'GET', null, null, (res => {
             if (res.success) {
-                console.log(res)
+                // console.log(res)
                 this.setState({
                     lista_prenotazioni_campo: res.data
                 })
@@ -137,13 +137,13 @@ class PrenotazioniCampo extends React.Component {
                     data={this.state.lista_prenotazioni_campo}
                     renderItem={({ item }) =>
                         <SafeAreaView style={styles.item}>
-                            <Text style={styles.giorno}>IdUtente : {item.idUtente}</Text>
+                            <Text style={styles.giorno}>Telofono: {item.telefono}</Text>
                             <Text style={styles.giorno}>{item.data}</Text>
                             <Text style={styles.ora}> Dalle: {item.oraInizio.slice(0, -4)} Alle: {item.oraFine.slice(0, -4)}</Text>
 
                         </SafeAreaView>
                     }
-                    keyExtractor={item => item.id + item.data + item.oraInizio + item.oraFine}
+                    key={item => item.id + item.data + item.oraInizio + item.oraFine}
                 />
             </SafeAreaView>
         );

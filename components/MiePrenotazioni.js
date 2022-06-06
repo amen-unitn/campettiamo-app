@@ -47,7 +47,7 @@ class ListaPrenotazioni extends React.Component {
             oraFine: orafine
         },
             (res => {
-                console.log(res)
+                // console.log(res)
                 if (res.success) {
                     Alert.alert('Ottimo', 'Prenotazione eliminata correttamente');
                 } else {
@@ -55,7 +55,7 @@ class ListaPrenotazioni extends React.Component {
                 }
             }),
             (err => {
-                console.log(err.message)
+                // console.log(err.message)
                 Alert.alert('Errore', 'Impossibile eliminare la prenotazione');
             }), null)
         this.getPrenotazioni();

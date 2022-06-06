@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Alert, Button, Text, TextInput } from 'react-native';
-import { SafeAreaView, FlatList, View} from 'react-native'; 
-import {TimePicker} from 'react-native-simple-time-picker';
+import { SafeAreaView, FlatList, View } from 'react-native';
+import { TimePicker } from 'react-native-simple-time-picker';
 import { apiCall } from './utils';
 import styles from '../styles/miei_campi';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -504,14 +504,14 @@ class Modifica_Slot extends React.Component {
             info: [],
             year: new Date().getFullYear(),
             month: new Date().getMonth() + 1,
-            currentday : ''
+            currentday: ''
         }
-        
+
         this.infoCampoDaID(this.state.id)
     }
 
     componentDidUpdate(prevProps, prevState) {
-    
+
     }
 
     componentWillUnmount() {
@@ -544,7 +544,7 @@ class Modifica_Slot extends React.Component {
     render() {
         return (
             <>
-                <SafeAreaView style={styles.container}> 
+                <SafeAreaView style={styles.container}>
                     <Text style={{
                         fontWeight: 'bold',
                         fontSize: 20,
@@ -553,13 +553,13 @@ class Modifica_Slot extends React.Component {
                     }}>{this.state.info.nome}</Text>
                 </SafeAreaView>
                 <SafeAreaView>
-                <Text style={{
+                    <Text style={{
                         fontWeight: 'bold',
                         fontSize: 20,
                         justifyContent: 'flex-start',
                         textAlign: 'center'
                     }}>Seleziona il giorno</Text>
-                
+
                     <Calendar style={{
                         marginBottom: '25%',
                         marginHorizontal: '5%',
@@ -573,8 +573,8 @@ class Modifica_Slot extends React.Component {
                             arrowColor: '#72bb53',
                         }}
                         onDayPress={(data) => {
-                            this.navigation.navigate('Nuovo Slot' , { campo: this.state.id, giorno : data.dateString })
-                           
+                            this.navigation.navigate('Nuovo Slot', { campo: this.state.id, giorno: data.dateString })
+
                         }}
                     />
                 </SafeAreaView>
@@ -588,20 +588,20 @@ class New_Slot extends React.Component {
         super(props);
         this.navigation = props.navigation;
         this.state = {
-            isFetching : false,
-            slots : [],
+            isFetching: false,
+            slots: [],
             id: props.campo,
-            data : props.giorno,
-            oraInizio : '',
+            data: props.giorno,
+            oraInizio: '',
             oraFine: '',
-            
+
         }
-        
+
     }
-    
+
 
     onRefresh() {
-        this.setState({isFetching: true},() => {this.getSlot();});
+        this.setState({ isFetching: true }, () => { this.getSlot(); });
     }
 
     componentWillUnmount() {
@@ -623,18 +623,18 @@ class New_Slot extends React.Component {
 
     async getSlot() {
 
-        let url = 'campo/'+this.state.id+'/slot/giorno/'+this.state.data
-       
-        apiCall(await this.getToken(), url , 'GET', null, null, (res => {
+        let url = 'campo/' + this.state.id + '/slot/giorno/' + this.state.data
+
+        apiCall(await this.getToken(), url, 'GET', null, null, (res => {
             if (res.success) {
-                
+
                 this.setState({
-                     slots : res.data
+                    slots: res.data
                 })
             } else {
                 this.setState({
-                    
-                    slots : ["non sono stati trovati slots"]
+
+                    slots: ["non sono stati trovati slots"]
                 })
             }
         }), (err => {
@@ -643,53 +643,53 @@ class New_Slot extends React.Component {
         this.setState({ isFetching: false })
     }
 
-    async newSlotApicall () {
-        let url = 'campo/'+this.state.id+'/slot'
-    
+    async newSlotApicall() {
+        let url = 'campo/' + this.state.id + '/slot'
+
         let oraInizio = ''
         let oraFine = ''
-        let minuteInizio=''
-        let minuteFine= ''
+        let minuteInizio = ''
+        let minuteFine = ''
 
-        if (this.state.oraInizio.hours == undefined || this.state.oraInizio.minutes ==undefined ||this.state.oraFine.hours == undefined || this.state.oraFine.minutes ==undefined  ){
+        if (this.state.oraInizio.hours == undefined || this.state.oraInizio.minutes == undefined || this.state.oraFine.hours == undefined || this.state.oraFine.minutes == undefined) {
 
         } else {
-            if (this.state.oraInizio.hours < 10  ){
-                
-                oraInizio = '0'+this.state.oraInizio.hours+':'
-            }else {
-               
-                oraInizio = this.state.oraInizio.hours+':'
+            if (this.state.oraInizio.hours < 10) {
+
+                oraInizio = '0' + this.state.oraInizio.hours + ':'
+            } else {
+
+                oraInizio = this.state.oraInizio.hours + ':'
             }
-            if (this.state.oraFine.hours < 10  ){
-                
-                oraFine = '0'+this.state.oraFine.hours+':'
-            }else {
-                
-                oraFine = this.state.oraFine.hours+':'
+            if (this.state.oraFine.hours < 10) {
+
+                oraFine = '0' + this.state.oraFine.hours + ':'
+            } else {
+
+                oraFine = this.state.oraFine.hours + ':'
             }
-            if (this.state.oraInizio.minutes < 10  ){
-               
-                minuteInizio = '0'+this.state.oraInizio.minutes
-            }else {
-               
+            if (this.state.oraInizio.minutes < 10) {
+
+                minuteInizio = '0' + this.state.oraInizio.minutes
+            } else {
+
                 minuteInizio = this.state.oraInizio.minutes
             }
-            if (this.state.oraFine.minutes < 10  ){
-               
-                minuteFine = '0'+this.state.oraFine.minutes
-            }else {
-               
+            if (this.state.oraFine.minutes < 10) {
+
+                minuteFine = '0' + this.state.oraFine.minutes
+            } else {
+
                 minuteFine = this.state.oraFine.minutes
             }
         }
-        let orarioInizio = oraInizio+minuteInizio
-        let orarioFine = oraFine+minuteFine
-       
+        let orarioInizio = oraInizio + minuteInizio
+        let orarioFine = oraFine + minuteFine
 
-        
-        apiCall(await this.getToken(), url , 'POST', null,{ 
-            
+
+
+        apiCall(await this.getToken(), url, 'POST', null, {
+
             data: this.state.data,
             oraInizio: orarioInizio,
             oraFine: orarioFine
@@ -697,20 +697,20 @@ class New_Slot extends React.Component {
             if (res.success) {
                 Alert.alert('Ottimo', 'Slot Creato');
             } else {
-                
+
+                Alert.alert('Errore', 'Impossibile creare lo slot');
+            }
+        }), (err => {
             Alert.alert('Errore', 'Impossibile creare lo slot');
-        }
-    }), (err => {
-            Alert.alert('Errore', 'Impossibile creare lo slot');
-    }), null)
+        }), null)
     }
 
-async deleteSlot(orainizio , orafine){
-        let url = 'campo/'+this.state.id+'/slot'
-      
+    async deleteSlot(orainizio, orafine) {
+        let url = 'campo/' + this.state.id + '/slot'
 
-        apiCall(await this.getToken(), url , 'DELETE', null,{ 
-         
+
+        apiCall(await this.getToken(), url, 'DELETE', null, {
+
             data: this.state.data,
             oraInizio: orainizio,
             oraFine: orafine
@@ -718,77 +718,80 @@ async deleteSlot(orainizio , orafine){
             if (res.success) {
                 Alert.alert('Ottimo', 'Slot Eliminato');
             } else {
-                
+
                 Alert.alert('Errore', 'Impossibile eliminare lo slot');
             }
         }), (err => {
-                Alert.alert('Errore', 'Impossibile eliminare lo slot');
+            Alert.alert('Errore', 'Impossibile eliminare lo slot');
         }), null)
         this.getSlot();
     }
-    
+
     render() {
         return (
             <>
                 <SafeAreaView style={styles.container}>
                     <Text style={styles.title}>
-                    SLOTS : Tieni premuto per eliminare 
+                        SLOTS : Tieni premuto per eliminare
                     </Text>
-                <FlatList
+                    <FlatList
                         data={this.state.slots}
                         renderItem={({ item }) =>
                             <TouchableOpacity
                                 onLongPress={() => {
-                                        this.deleteSlot(item.oraInizio.slice(0,-4),item.oraFine.slice(0,-4) )
+                                    this.deleteSlot(item.oraInizio.slice(0, -4), item.oraFine.slice(0, -4))
 
                                 }}
                                 activeOpacity={0.8}
                             >
                                 <SafeAreaView style={styles.item}>
-                                    <Text style={styles.text}>{item.oraInizio.slice(0,-4)}</Text>
-                                    <Text style={styles.text}>{item.oraFine.slice(0,-4)}</Text>
+                                    <Text style={styles.text}>{item.oraInizio.slice(0, -4)}</Text>
+                                    <Text style={styles.text}>{item.oraFine.slice(0, -4)}</Text>
                                 </SafeAreaView>
                             </TouchableOpacity>
                         }
                         keyExtractor={item => item.id}
                         onRefresh={() => this.onRefresh()}
                         refreshing={this.state.isFetching}
-                        
-                    />          
-                            
+
+                    />
+
                 </SafeAreaView>
 
-                  
+
                 <SafeAreaView style={styles.container}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>
-                        Scegli ora inizio
-                    </Text>
-                    <TimePicker
-                    onChange={(hours, minutes) => {
-                        this.state.oraInizio = hours
-                       
-                    }}
-                    />
-                </View>
+                    <View style={styles.container}>
+                        <Text style={styles.title}>
+                            Scegli ora inizio
+                        </Text>
+                        <TimePicker
+                            onChange={(hours, minutes) => {
+                                this.state.oraInizio = hours
+
+                            }}
+                        />
+                    </View>
                 </SafeAreaView>
-                
+
                 <SafeAreaView style={styles.container}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>
-                        Scegli ora Fine
-                    </Text>
-                    <TimePicker
-                    onChange={(hours, minutes) => {
-                        this.state.oraFine = hours
-                        
-                    }}
-                    />
-                </View>
+                    <View style={styles.container}>
+                        <Text style={styles.title}>
+                            Scegli ora Fine
+                        </Text>
+                        <TimePicker
+                            onChange={(hours, minutes) => {
+                                this.state.oraFine = hours
+
+                            }}
+                        />
+                    </View>
                 </SafeAreaView>
-                
+
                 <SafeAreaView style={styles.crea}>
-                            <Button color='#72bb53' title='Crea Slot' onPress={() => this.newSlotApicall()} />
+                    <Button color='#72bb53' title='Crea Slot' onPress={() => {
+                        this.newSlotApicall()
+                        this.forceUpdate()
+                    }} />
                 </SafeAreaView>
             </>
         )
