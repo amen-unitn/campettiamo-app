@@ -81,7 +81,7 @@ class ListaPrenotazioni extends React.Component {
                             <TouchableOpacity
                                 onLongPress={
                                     () => {
-                                        this.deletePrenotazione(item.oraInizio.slice(0,-4),item.oraFine.slice(0,-4) )
+                                        this.deletePrenotazione(item.data, item.oraInizio.slice(0,-4), item.oraFine.slice(0,-4) )
                                     }
                                 }
                                 activeOpacity={0.8}
