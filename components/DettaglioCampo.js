@@ -86,8 +86,7 @@ class Dettaglio extends React.Component {
                         onDayPress={(data) => {
                             this.navigation.navigate('Slots', {
                                 data: data.dateString,
-                                campo: this.state.campo.id,
-                                tariffa: this.state.campo.tariffa,
+                                campo: this.state.campo.id
                             })
                         }}
                     />

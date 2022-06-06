@@ -45,6 +45,14 @@ styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: '3%',
   },
+  buttonDisabled: {
+    backgroundColor: '#83917d',
+    minWidth: '80%',
+    maxWidth: '80%',
+    alignItems: 'center',
+    borderRadius: 10,
+    paddingVertical: '3%',
+  },
   buttonText: {
     color: 'white',
     fontSize: 20,

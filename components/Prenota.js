@@ -12,17 +12,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiCall } from './utils';
 import styles from '../styles/prenota';
 
-const Prenota = (props) => {    
+const Prenota = (props) => {
 
     const [times_pressed, setTimesPressed] = useState(0);
     const [oraInizio, setOraInizio] = useState('');
     const [oraFine, setOraFine] = useState('');
     const [slotLiberi, setSlotLiberi] = useState([]);
-    const [buttonText, setButtonText] = useState('ACCEDI A PAYPAL');
-
+    const [buttonText, setButtonText] = useState('CONFERMA');
+    const [amount , setAmount] = useState(0);
+    const [refresh, setRefresh] = useState(true);
     const [clientId, setClientId] = useState('');
     const [serverToken, setServerToken] = useState('');
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
 
     const [success, setSuccess] = useState({
         nonce: '',
@@ -33,15 +34,34 @@ const Prenota = (props) => {
         phone: '',
     });
 
-    const get_slots = async () => {
+    const get_slots = () => {
         apiCall(serverToken, 'campo/' + props.campo + '/slot/giorno/' + props.data, 'GET', null, null, (res => {
             if (res.success) {
                 setSlotLiberi(res.data)
+                setRefresh(false);
             } else {
                 setSlotLiberi([])
             }
         }), (err => {
             Alert.alert('Errore', 'Impossibile caricare gli slot');
+        }), props.navigation)
+    }
+
+    const get_amount = async () => {
+        await apiCall(serverToken, 'paypal/amount', 'GET', [
+            { name: 'idCampo', value: props.campo },
+            { name: 'data', value: props.data },
+            { name: 'oraInizio', value: oraInizio },
+            { name: 'oraFine', value: oraFine }
+        ], null, (res => {
+            if (res.success) {
+                setAmount(res.amount);
+                Alert.alert('L\'importo è di ' + res.amount + '€', 'Ora puoi procedere con il pagamento')
+            } else {
+                Alert.alert('Errore', 'Impossibile ottenere l\'importo');
+            }
+        }), (err => {
+            Alert.alert('Errore', 'Impossibile ottenere l\'importo');
         }), props.navigation)
     }
 
@@ -51,17 +71,23 @@ const Prenota = (props) => {
 
     const prenota = async () => {
         if (times_pressed === 0) {
-            requestPayment();
+            await get_amount().then(
+                
+            );
+            setButtonText('ACCEDI A PAYPAL')
+            setTimesPressed(1);
+        } else if (times_pressed === 1) {
+            requestPayment()
             setButtonText('PAGA E CONFERMA')
-            setTimesPressed(1)
+            setTimesPressed(2)
         } else {
             checkIfCanBook();
             setDisabled(true)
         }
     }
 
-    const checkIfCanBook = () => {
-        apiCall(serverToken, 'campo/' + props.campo + '/prenota', 'POST', null, {
+    const checkIfCanBook = async () => {
+        await apiCall(serverToken, 'campo/' + props.campo + '/prenota', 'POST', null, {
             data: props.data,
             oraInizio: oraInizio,
             oraFine: oraFine,
@@ -82,6 +108,15 @@ const Prenota = (props) => {
         } else
             // keep only first 5 characters
             setOraInizio(text.substring(0, 5));
+
+        let ora = parseInt(text.substring(0, 2));
+        let minuti = parseInt(text.substring(3, 5));
+        if (ora >= 0 && ora <= 23 && minuti >= 0 && minuti <= 59 && text.length === 5) {
+            setDisabled(false);
+        } else {
+            setDisabled(true);
+        }
+
     }
 
     const handleFineHourInput = (text) => {
@@ -90,6 +125,15 @@ const Prenota = (props) => {
         } else
             // keep only first 5 characters
             setOraFine(text.substring(0, 5));
+
+        let ora = parseInt(text.substring(0, 2));
+        let minuti = parseInt(text.substring(3, 5));
+        if (ora >= 0 && ora <= 23 && minuti >= 0 && minuti <= 59 && text.length === 5) {
+            setDisabled(false);
+        } else {
+            setDisabled(true);
+        }
+
     }
 
     const fetchToken = async () => {
@@ -103,26 +147,24 @@ const Prenota = (props) => {
 
     fetchToken();
 
-    const errorAlert = (err) => {
-        if (err) Alert.alert('Oops! Qualcosa è andato storto riprova', err);
-    };
-
     const requestPayment = () => {
         apiCall(serverToken, "paypal/client", "GET", [{ name: "id", value: clientId }], null, (response) => {
-            requestOneTimePayment(response.token, { amount: props.amount.toString() })
+            requestOneTimePayment(response.token, { amount: amount.toString() })
                 .then(setSuccess)
         }, (err) => {
-            errorAlert(err);
+            Alert.alert('Errore', 'Impossibile richiedere il pagamento');
         }, null)
     }
 
     const submitPayment = async () => {
         if (success.nonce) {
-            await apiCall(serverToken, "paypal/paga", "POST", null, { nonce: success.nonce, amount: props.amount.toString() }, (success, message) => {
-                Alert.alert("Prenotazione effettuata", "Pagamento andato a buon fine")
-                setDisabled(true)
+            await apiCall(serverToken, "paypal/paga", "POST", null, { nonce: success.nonce, amount: amount.toString() }, (success, message) => {
+                if (success) {
+                    Alert.alert('Prenotazione effettuata', 'Prenotazione effettuata con successo');
+                    setDisabled(true);
+                }
             }, (err) => {
-                errorAlert(err.message)
+                Alert.alert('Oops!', 'Qualcosa è andato storto, riprova!');
             }, null)
         }
     }
@@ -143,6 +185,12 @@ const Prenota = (props) => {
                         )
                     }}
                     keyExtractor={item => item.oraInizio}
+                    refreshing={refresh}
+                    onRefresh={() => {
+                        setRefresh(true);
+                        get_slots();
+                    }}
+
                 />
                 <SafeAreaView style={{
                     minWidth: '90%',
@@ -171,7 +219,9 @@ const Prenota = (props) => {
                         }}>Per confermare la tua prenotazione devi prima accedere al tuo account PayPal e poi pagare</Text>
                     </SafeAreaView>
                     <SafeAreaView>
-                        <TouchableOpacity onPress={prenota} disabled={disabled} style={styles.button}>
+                        <TouchableOpacity onPress={prenota} disabled={disabled} style={
+                            disabled ? styles.buttonDisabled : styles.button
+                        }>
                             <Text style={styles.buttonText}>{buttonText}</Text>
                         </TouchableOpacity>
                     </SafeAreaView>

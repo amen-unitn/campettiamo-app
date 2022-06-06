@@ -77,7 +77,7 @@ class MieiCampiPrenotazioni extends React.Component {
                                 </SafeAreaView>
                             </TouchableOpacity>
                         }
-                        keyExtractor={item => item.id}
+                        keyExtractor={item => item.id+item.data+item.oraInizio+item.oraFine}
                         refreshing={this.state.refresh}
                         onRefresh={() => {
                             this.getCampi();
