@@ -25,22 +25,29 @@ class ListaPrenotazioni extends React.Component {
         this.setState({ refresh: false });
     }
 
+    componentWillUnmount() {
+        // fix Warning: Can't perform a React state update on an unmounted component
+        this.setState = (state, callback) => {
+            return;
+        };
+    }
+
     async getToken() {
         if (!this.state.token)
             this.state.token = await AsyncStorage.getItem('TOKEN');
         return this.state.token;
     }
 
-    async deletePrenotazione(datapre, orainizio, orafine){
-        let url = 'campo/'+this.state.id+'/prenota'
-      
+    async deletePrenotazione(datapre, orainizio, orafine, id) {
+        let url = 'campo/' + id + '/prenota'
 
         apiCall(await this.getToken(), url, 'DELETE', null, {
-                data: datapre,
-                oraInizio: orainizio,
-                oraFine: orafine
-            },
+            data: datapre,
+            oraInizio: orainizio,
+            oraFine: orafine
+        },
             (res => {
+                console.log(res)
                 if (res.success) {
                     Alert.alert('Ottimo', 'Prenotazione eliminata correttamente');
                 } else {
@@ -48,7 +55,8 @@ class ListaPrenotazioni extends React.Component {
                 }
             }),
             (err => {
-                    Alert.alert('Errore', 'Impossibile eliminare la prenotazione');
+                console.log(err.message)
+                Alert.alert('Errore', 'Impossibile eliminare la prenotazione');
             }), null)
         this.getPrenotazioni();
     }
@@ -81,7 +89,8 @@ class ListaPrenotazioni extends React.Component {
                             <TouchableOpacity
                                 onLongPress={
                                     () => {
-                                        this.deletePrenotazione(item.data, item.oraInizio.slice(0,-4), item.oraFine.slice(0,-4) )
+                                        this.deletePrenotazione(item.data, item.oraInizio.slice(0, -4), item.oraFine.slice(0, -4), item.id)
+                                        this.forceUpdate()
                                     }
                                 }
                                 activeOpacity={0.8}
@@ -95,6 +104,8 @@ class ListaPrenotazioni extends React.Component {
                             </TouchableOpacity>
                         }
                         keyExtractor={item => item.id + item.data + item.oraInizio + item.oraFine}
+                        refreshing={this.state.refresh}
+                        onRefresh={() => this.getPrenotazioni()}
                     />
                 </SafeAreaView>
             </>
